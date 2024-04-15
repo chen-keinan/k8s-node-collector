@@ -89,14 +89,14 @@ func CollectData(cmd *cobra.Command, target string) error {
 		}
 		nodeName := cmd.Flag("node").Value.String()
 		nodeConfig, err := loadNodeConfig(ctx, *cluster, nodeName)
-		if err != nil {
-			return err
+		if err == nil {
+
+			configVal, err := getValuesFromkubeletConfig(nodeConfig)
+			if err != nil {
+				return err
+			}
+			mergeConfigValues(nodeInfo, configVal)
 		}
-		configVal, err := getValuesFromkubeletConfig(nodeConfig)
-		if err != nil {
-			return err
-		}
-		mergeConfigValues(nodeInfo, configVal)
 		nodeData := Node{
 			APIVersion: Version,
 			Kind:       Kind,
