@@ -19,10 +19,14 @@ var configMapper = map[string]string{
 	"kubeletClientCaFileArgumentSet":                   "authentication.x509.clientCAFile",
 	"kubeletReadOnlyPortArgumentSet":                   "readOnlyPort",
 	"kubeletStreamingConnectionIdleTimeoutArgumentSet": "streamingConnectionIdleTimeout",
-	"kubeletProtectKernelDefaultsArgumentSet":          "kernelMemcgNotification",
+	"kubeletProtectKernelDefaultsArgumentSet":          "protectKernelDefaults",
 	"kubeletMakeIptablesUtilChainsArgumentSet":         "makeIPTablesUtilChains",
 	"kubeletEventQpsArgumentSet":                       "eventRecordQPS",
 	"kubeletRotateKubeletServerCertificateArgumentSet": "featureGates.RotateKubeletServerCertificate",
+	"kubeletRotateCertificatesArgumentSet":             "rotateCertificates",
+	"kubeletTlsCertFileTlsArgumentSet":                 "tlsCertFile",
+	"kubeletTlsPrivateKeyFileArgumentSet":              "tlsPrivateKeyFile",
+	"kubeletOnlyUseStrongCryptographic":                "tlsCipherSuites",
 }
 
 type SpecVersion struct {
@@ -69,7 +73,7 @@ func CollectData(cmd *cobra.Command, target string) error {
 	specVersion := cmd.Flag("version").Value.String()
 	sv := SpecVersion{Name: specName, Version: specVersion}
 	if len(sv.Name) == 0 || len(sv.Version) == 0 {
-		sv = specByPlatfromVersion(p.Name, p.Version)
+		sv = specByPlatfromVersion(p.Name)
 	}
 	for _, infoCollector := range infoCollectorMap {
 		nodeInfo := make(map[string]*Info)
@@ -126,7 +130,7 @@ func loadNodeConfig(ctx context.Context, cluster Cluster, nodeName string) (map[
 	return nodeConfig, nil
 }
 
-func specByPlatfromVersion(platfrom string, version string) SpecVersion {
+func specByPlatfromVersion(platfrom string) SpecVersion {
 	return platfromSpec[fmt.Sprintf("%s-%s", platfrom, platfrom)]
 }
 
@@ -150,6 +154,8 @@ func getValuesFromkubeletConfig(nodeConfig map[string]interface{}) (map[string]*
 			switch r := p.(type) {
 			case bool:
 				overrideConfig[k] = &Info{Values: []interface{}{strconv.FormatBool(r)}}
+			case []interface{}:
+				overrideConfig[k] = &Info{Values: r}
 			default:
 				overrideConfig[k] = &Info{Values: []interface{}{r}}
 			}

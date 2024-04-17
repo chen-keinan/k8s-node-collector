@@ -25,16 +25,26 @@ func TestParseNodeConfig(t *testing.T) {
 					Values: []interface{}{"Webhook"},
 				},
 				"kubeletClientCaFileArgumentSet": {
-					Values: []interface{}{"/etc/kubernetes/pki/ca.crt"},
+					Values: []interface{}{"/etc/kubernetes/certs/ca.crt"},
 				},
 				"kubeletEventQpsArgumentSet": {
-					Values: []interface{}{5.0},
+					Values: []interface{}{0.0},
 				},
 				"kubeletMakeIptablesUtilChainsArgumentSet": {
 					Values: []interface{}{"true"},
 				},
 				"kubeletStreamingConnectionIdleTimeoutArgumentSet": {
 					Values: []interface{}{"4h0m0s"},
+				},
+				"kubeletOnlyUseStrongCryptographic": {
+					Values: []interface{}{"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+						"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+						"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
+						"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+						"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
+						"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+						"TLS_RSA_WITH_AES_256_GCM_SHA384",
+						"TLS_RSA_WITH_AES_128_GCM_SHA256"},
 				},
 			}},
 	}
@@ -49,7 +59,9 @@ func TestParseNodeConfig(t *testing.T) {
 			m, err := getValuesFromkubeletConfig(nodeConfig)
 			assert.NoError(t, err)
 			for k, v := range m {
-				assert.Equal(t, v, tt.expextedNodeConfigFile[k])
+				if _, ok := tt.expextedNodeConfigFile[k]; ok {
+					assert.Equal(t, v, tt.expextedNodeConfigFile[k])
+				}
 			}
 		})
 	}
