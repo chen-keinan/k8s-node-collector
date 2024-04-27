@@ -3,12 +3,12 @@ package collector
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	//"errors"
 	"fmt"
 	"log"
-	"os"
+	//"os"
 	"strconv"
-	"time"
+	//"time"
 
 	"github.com/spf13/cobra"
 )
@@ -44,76 +44,84 @@ var platfromSpec = map[string]SpecVersion{
 // CollectData run spec audit command and output it result data
 func CollectData(cmd *cobra.Command, target string) error {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-	cluster, err := GetCluster()
-	if err != nil {
-		return err
-	}
-	ctx, cancel := context.WithTimeout(cmd.Context(), time.Duration(10)*time.Minute)
-	defer cancel()
-
-	defer func() {
-		if errors.Is(err, context.DeadlineExceeded) {
-			log.Println("Increase --timeout value")
+	/*
+		cluster, err := GetCluster()
+		if err != nil {
+			return err
 		}
-	}()
-	p, err := cluster.Platfrom()
-	if err != nil {
-		return err
-	}
-	shellCmd := NewShellCmd()
-	nodeType, err := shellCmd.FindNodeType()
-	if err != nil {
-		return err
-	}
+		ctx, cancel := context.WithTimeout(cmd.Context(), time.Duration(10)*time.Minute)
+		defer cancel()
+
+		defer func() {
+			if errors.Is(err, context.DeadlineExceeded) {
+				log.Println("Increase --timeout value")
+			}
+		}()
+		p, err := cluster.Platfrom()
+		if err != nil {
+			return err
+		}
+		shellCmd := NewShellCmd()
+		nodeType, err := shellCmd.FindNodeType()
+		if err != nil {
+			return err
+		}*/
 	infoCollectorMap, err := LoadConfig(target)
 	if err != nil {
 		return err
 	}
-	specName := cmd.Flag("spec").Value.String()
-	specVersion := cmd.Flag("version").Value.String()
-	sv := SpecVersion{Name: specName, Version: specVersion}
-	if len(sv.Name) == 0 || len(sv.Version) == 0 {
-		sv = specByPlatfromVersion(p.Name)
+	fmt.Println(infoCollectorMap)
+	lp, err := LoadConfigParams()
+	if err != nil {
+		return err
 	}
-	for _, infoCollector := range infoCollectorMap {
-		nodeInfo := make(map[string]*Info)
-		if !(infoCollector.Version == sv.Version && infoCollector.Name == sv.Name) {
-			continue
+	fmt.Println(lp)
+	/*
+		specName := cmd.Flag("spec").Value.String()
+		specVersion := cmd.Flag("version").Value.String()
+		sv := SpecVersion{Name: specName, Version: specVersion}
+		if len(sv.Name) == 0 || len(sv.Version) == 0 {
+			sv = specByPlatfromVersion(p.Name)
 		}
-		for _, ci := range infoCollector.Collectors {
-			if ci.NodeType != nodeType && nodeType != MasterNode {
+		for _, infoCollector := range infoCollectorMap {
+			nodeInfo := make(map[string]*Info)
+			if !(infoCollector.Version == sv.Version && infoCollector.Name == sv.Name) {
 				continue
 			}
-			output, err := shellCmd.Execute(ci.Audit)
-			if err != nil {
-				fmt.Print(err)
+			for _, ci := range infoCollector.Collectors {
+				if ci.NodeType != nodeType && nodeType != MasterNode {
+					continue
+				}
+				output, err := shellCmd.Execute(ci.Audit)
+				if err != nil {
+					fmt.Print(err)
+				}
+				values := StringToArray(output, ",")
+				nodeInfo[ci.Key] = &Info{Values: values}
 			}
-			values := StringToArray(output, ",")
-			nodeInfo[ci.Key] = &Info{Values: values}
-		}
-		nodeName := cmd.Flag("node").Value.String()
-		nodeConfig, err := loadNodeConfig(ctx, *cluster, nodeName)
-		if err == nil {
+			nodeName := cmd.Flag("node").Value.String()
+			nodeConfig, err := loadNodeConfig(ctx, *cluster, nodeName)
+			if err == nil {
 
-			configVal, err := getValuesFromkubeletConfig(nodeConfig)
+				configVal, err := getValuesFromkubeletConfig(nodeConfig)
+				if err != nil {
+					return err
+				}
+				mergeConfigValues(nodeInfo, configVal)
+			}
+			nodeData := Node{
+				APIVersion: Version,
+				Kind:       Kind,
+				Type:       nodeType,
+				Metadata:   map[string]string{"creationTimestamp": time.Now().Format(time.RFC3339)},
+				Info:       nodeInfo,
+			}
+			outputFormat := cmd.Flag("output").Value.String()
+			err = printOutput(nodeData, outputFormat, os.Stdout)
 			if err != nil {
 				return err
 			}
-			mergeConfigValues(nodeInfo, configVal)
-		}
-		nodeData := Node{
-			APIVersion: Version,
-			Kind:       Kind,
-			Type:       nodeType,
-			Metadata:   map[string]string{"creationTimestamp": time.Now().Format(time.RFC3339)},
-			Info:       nodeInfo,
-		}
-		outputFormat := cmd.Flag("output").Value.String()
-		err = printOutput(nodeData, outputFormat, os.Stdout)
-		if err != nil {
-			return err
-		}
-	}
+		}*/
 	return nil
 }
 
