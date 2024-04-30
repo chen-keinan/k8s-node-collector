@@ -37,7 +37,7 @@ func LoadConfig(target string, configMap map[string]string) (map[string]*SpecInf
 		}
 		updatedContent := string(fContent)
 		for k, v := range configMap {
-			updatedContent = strings.ReplaceAll(string(fContent), k, v)
+			updatedContent = strings.ReplaceAll(updatedContent, k, v)
 		}
 		si, err := getSpecInfo(updatedContent)
 		if err != nil {

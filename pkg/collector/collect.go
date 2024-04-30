@@ -42,7 +42,7 @@ type SpecVersion struct {
 
 var platfromSpec = map[string]SpecVersion{
 	"k8s-1.23": {
-		Name:    "cis",
+		Name:    "k8s-cis",
 		Version: "1.23",
 	},
 }
@@ -82,7 +82,6 @@ func CollectData(cmd *cobra.Command, target string) error {
 	if err != nil {
 		return err
 	}
-
 	specName := cmd.Flag("spec").Value.String()
 	specVersion := cmd.Flag("version").Value.String()
 	sv := SpecVersion{Name: specName, Version: specVersion}
@@ -100,7 +99,7 @@ func CollectData(cmd *cobra.Command, target string) error {
 			}
 			output, err := shellCmd.Execute(ci.Audit)
 			if err != nil {
-				fmt.Print(err)
+				return err
 			}
 			values := StringToArray(output, ",")
 			nodeInfo[ci.Key] = &Info{Values: values}
@@ -203,29 +202,23 @@ func binLookup(binsNames []string, defaultBinName string, sh Shell) string {
 }
 
 func configLookup(configNames []string, defaultConfigName string, sh Shell) string {
-	var s strings.Builder
 	if len(configNames) == 0 {
 		return ""
 	}
 	for _, config := range configNames {
-		s.WriteString(config + " \n")
-	}
-	config := fmt.Sprintf(`declare -a config_paths=(%s)
-		for path in "${config_paths[@]}"; do
-  		ls  "$path" 2>/dev/null 
-		done | awk 'NR==1'`, s.String())
-	cmdConfig, err := sh.Execute(config)
-	if err != nil {
-		return defaultConfigName
-	}
-	if strings.TrimSpace(cmdConfig) != "" {
-		return cmdConfig
+		configCms := fmt.Sprintf(`ls %s 2>/dev/null | awk 'NR==1'`, config)
+		cmdConfig, err := sh.Execute(configCms)
+		if err != nil {
+			return defaultConfigName
+		}
+		if strings.TrimSpace(cmdConfig) != "" {
+			return cmdConfig
+		}
 	}
 	return defaultConfigName
 }
 
 func configData(param Params, sh Shell, binName string, paramMaps map[string]string) {
-
 	bins := binLookup(param.Binaries, param.DefaultBinaries, sh)
 	if bins != "" {
 		paramMaps[fmt.Sprintf("$%s.bins", binName)] = bins
