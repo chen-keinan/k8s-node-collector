@@ -3,6 +3,7 @@ package collector
 import (
 	"embed"
 	"fmt"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -22,7 +23,7 @@ var config embed.FS
 var params embed.FS
 
 // LoadConfig load audit commands specification from config file
-func LoadConfig(target string) (map[string]*SpecInfo, error) {
+func LoadConfig(target string, configMap map[string]string) (map[string]*SpecInfo, error) {
 	fullPath := fmt.Sprintf("%s/%s", configFolder, target)
 	dirEntries, err := config.ReadDir(fullPath)
 	if err != nil {
@@ -34,7 +35,11 @@ func LoadConfig(target string) (map[string]*SpecInfo, error) {
 		if err != nil {
 			return nil, err
 		}
-		si, err := getSpecInfo(string(fContent))
+		updatedContent := string(fContent)
+		for k, v := range configMap {
+			updatedContent = strings.ReplaceAll(string(fContent), k, v)
+		}
+		si, err := getSpecInfo(updatedContent)
 		if err != nil {
 			return nil, err
 		}
