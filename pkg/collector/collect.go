@@ -8,13 +8,11 @@ import (
 	"strings"
 	"time"
 
-	// "errors"
 	"fmt"
 	"log"
-
+	"path/filepath"
 	// "os"
 	"strconv"
-	// "time"
 
 	"github.com/spf13/cobra"
 )
@@ -231,18 +229,23 @@ func configData(param Params, sh Shell, binName string, paramMaps map[string]str
 	if kubeConfig != "" {
 		paramMaps[fmt.Sprintf("$%s.kubeconfig", binName)] = kubeConfig
 	}
-	dataDir := configLookup(param.DataDirs, param.DefaultDataDir, sh)
+	dataDir := folderLookup(param.DataDirs, param.DefaultDataDir, sh)
 	if dataDir != "" {
 		paramMaps[fmt.Sprintf("$%s.datadirs", binName)] = dataDir
 	}
 	services := configLookup(param.Services, param.DefalutServices, sh)
 	if services != "" {
-		paramMaps[fmt.Sprintf("$%s.datadirs", binName)] = services
+		paramMaps[fmt.Sprintf("$%s.svc", binName)] = services
 	}
-	CAFile := configLookup(param.CAFile, param.DefaultCAFile, sh)
+	CAFile := folderLookup(param.CAFile, param.DefaultCAFile, sh)
 	if CAFile != "" {
-		paramMaps[fmt.Sprintf("$%s.datadirs", binName)] = CAFile
+		paramMaps[fmt.Sprintf("$%s.cafile", binName)] = CAFile
 	}
+}
+
+func folderLookup(paths []string, defaultFolder string, sh Shell) string {
+	path := configLookup(paths, defaultFolder, sh)
+	return filepath.Dir(path)
 }
 
 func configParams(config *Config, sh Shell) map[string]string {
