@@ -58,6 +58,20 @@ func LoadConfigParams() (*Config, error) {
 	return getNodeParams(string(fContent))
 }
 
+func LoadKubeletMapping() (map[string]string, error) {
+	fullPath := fmt.Sprintf("%s/%s", configFolder, "kubeletconfig-mapping.yaml")
+	fContent, err := params.ReadFile(fullPath)
+	if err != nil {
+		return nil, err
+	}
+	mapping := make(map[string]string)
+	err = yaml.Unmarshal(fContent, &mapping)
+	if err != nil {
+		return nil, err
+	}
+	return mapping, nil
+}
+
 // SpecInfo spec info with require comand to collect
 type SpecInfo struct {
 	Version    string      `yaml:"version"`
