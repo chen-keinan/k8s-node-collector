@@ -56,8 +56,7 @@ func TestParseNodeConfig(t *testing.T) {
 			nodeConfig := make(map[string]interface{})
 			err = json.Unmarshal(data, &nodeConfig)
 			assert.NoError(t, err)
-			m, err := getValuesFromkubeletConfig(nodeConfig)
-			assert.NoError(t, err)
+			m := getValuesFromkubeletConfig(nodeConfig)
 			for k, v := range m {
 				if _, ok := tt.expextedNodeConfigFile[k]; ok {
 					assert.Equal(t, v, tt.expextedNodeConfigFile[k])

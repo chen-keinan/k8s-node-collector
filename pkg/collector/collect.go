@@ -105,11 +105,9 @@ func CollectData(cmd *cobra.Command, target string) error {
 		nodeName := cmd.Flag("node").Value.String()
 		nodeConfig, err := loadNodeConfig(ctx, *cluster, nodeName)
 		if err == nil {
-
-			configVal, err := getValuesFromkubeletConfig(nodeConfig)
-			if err != nil {
-				return err
-			}
+			b, _ := json.Marshal(nodeConfig)
+			fmt.Println(string(b))
+			configVal := getValuesFromkubeletConfig(nodeConfig)
 			mergeConfigValues(nodeInfo, configVal)
 		}
 		nodeData := Node{
@@ -131,6 +129,7 @@ func CollectData(cmd *cobra.Command, target string) error {
 func loadNodeConfig(ctx context.Context, cluster Cluster, nodeName string) (map[string]interface{}, error) {
 	data, err := cluster.clientSet.RESTClient().Get().AbsPath(fmt.Sprintf("/api/v1/nodes/%s/proxy/configz", nodeName)).DoRaw(ctx)
 	if err != nil {
+		fmt.Println(err.Error())
 		return nil, err
 	}
 	nodeConfig := make(map[string]interface{})
@@ -145,7 +144,7 @@ func specByPlatfromVersion(platfrom string) SpecVersion {
 	return platfromSpec[fmt.Sprintf("%s-%s", platfrom, platfrom)]
 }
 
-func getValuesFromkubeletConfig(nodeConfig map[string]interface{}) (map[string]*Info, error) {
+func getValuesFromkubeletConfig(nodeConfig map[string]interface{}) map[string]*Info {
 	overrideConfig := make(map[string]*Info)
 	values := nodeConfig["kubeletconfig"]
 	for k, v := range configMapper {
@@ -172,7 +171,7 @@ func getValuesFromkubeletConfig(nodeConfig map[string]interface{}) (map[string]*
 			}
 		}
 	}
-	return overrideConfig, nil
+	return overrideConfig
 }
 
 func mergeConfigValues(configValues map[string]*Info, overrideConfig map[string]*Info) map[string]*Info {
@@ -193,7 +192,7 @@ func binLookup(binsNames []string, defaultBinName string, sh Shell) string {
 			return defaultBinName
 		}
 		if strings.TrimSpace(name) != "" {
-			return name
+			return filepath.Base(name)
 		}
 	}
 	return defaultBinName
@@ -245,6 +244,9 @@ func configData(param Params, sh Shell, binName string, paramMaps map[string]str
 
 func folderLookup(paths []string, defaultFolder string, sh Shell) string {
 	path := configLookup(paths, defaultFolder, sh)
+	if path == "" {
+		return ""
+	}
 	return filepath.Dir(path)
 }
 

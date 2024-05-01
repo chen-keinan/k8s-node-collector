@@ -27,7 +27,7 @@ node:
       - /var/lib/kube-controller-manager/kubeconfig
       - /system/secrets/kubernetes/kube-controller-manager/kubeconfig
     defaultkubeconfig: /etc/kubernetes/controller-manager.conf
-  
+
   scheduler:
     confs:
       - /etc/kubernetes/manifests/kube-scheduler.yaml
@@ -68,7 +68,7 @@ node:
 
   kubernetes:
     defaultconf: "/etc/kubernetes/config"
-    
+
   kubelet:
     cafile:
       - "/etc/kubernetes/pki/ca.crt"
