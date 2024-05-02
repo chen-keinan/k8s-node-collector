@@ -124,8 +124,8 @@ func loadNodeConfig(ctx context.Context, cluster Cluster, nodeName string) (map[
 	return nodeConfig, nil
 }
 
-func specByPlatfromVersion(platfrom string) SpecVersion {
-	return platfromSpec[fmt.Sprintf("%s-%s", platfrom, platfrom)]
+func specByPlatfromVersion(platfrom Platform) SpecVersion {
+	return platfromSpec[fmt.Sprintf("%s-%s", platfrom.Name, platfrom.Version)]
 }
 
 func getValuesFromkubeletConfig(nodeConfig map[string]interface{}, configMapper map[string]string) map[string]*Info {
