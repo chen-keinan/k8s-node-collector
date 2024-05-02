@@ -67,7 +67,7 @@ func CollectData(cmd *cobra.Command, target string) error {
 	specVersion := cmd.Flag("version").Value.String()
 	sv := SpecVersion{Name: specName, Version: specVersion}
 	if len(sv.Name) == 0 || len(sv.Version) == 0 {
-		sv = specByPlatfromVersion(p.Name)
+		sv = specByPlatfromVersion(p)
 	}
 	for _, infoCollector := range infoCollectorMap {
 		nodeInfo := make(map[string]*Info)
