@@ -16,7 +16,7 @@ const (
 	Kind = "NodeInfo"
 )
 
-//go:embed config/k8s
+//go:embed config/specs
 var config embed.FS
 
 //go:embed config
