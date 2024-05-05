@@ -163,18 +163,31 @@ node:
     defaultkubeconfig: "/etc/kubernetes/proxy.conf"
 
 version_mapping:
-  "1.23": "cis-1.23"
-  "1.24": "cis-1.24"
-  "1.25": "cis-1.7"
-  "1.26": "cis-1.8"
-  "eks-1.2.0": "eks-1.2.0"
-  "gke-1.0": "gke-1.0"
-  "gke-1.2.0": "gke-1.2.0"
-  "ocp-4.0": "rh-1.0"
-  "aks-1.0": "aks-1.0"
-  "ack-1.0": "ack-1.0"
-  "cis-1.6-k3s": "cis-1.6-k3s"
-  "cis-1.24-microk8s": "cis-1.24-microk8s"
-  "tkgi-1.2.53": "tkgi-1.2.53"
-  "k3s-cis-1.24": "k3s-cis-1.24"
-  "rke2-cis-1.24": "rke2-cis-1.24"
+  k8s:
+  - op: ">="
+    cluster_version: '1.21'
+    spec: k8s-cis-1.23.0
+  gke:
+  - op: ">="
+    cluster_version: '1.21'
+    spec: gke-cis-1.2.0
+  eks:
+  - op: ">="
+    cluster_version: '1.21'
+    spec: eks-cis-1.2.0
+  aks:
+  - op: ">="
+    cluster_version: '1.21'
+    spec: aks-cis-1.0
+  rke2:
+  - op: ">="
+    cluster_version: '1.21'
+    spec: rke2-cis-1.24
+  microk8s:
+  - op: ">="
+    cluster_version: '1.21'
+    spec: microk8s-cis-1.24
+  ocp:
+  - op: ">="
+    cluster_version: '4.0'
+    spec: rh-cis-1.0

@@ -14,20 +14,9 @@ import (
 
 	"strconv"
 
+	"github.com/Masterminds/semver"
 	"github.com/spf13/cobra"
 )
-
-type SpecVersion struct {
-	Name    string
-	Version string
-}
-
-var platfromSpec = map[string]SpecVersion{
-	"k8s-1.23": {
-		Name:    "k8s-cis",
-		Version: "1.23",
-	},
-}
 
 // CollectData run spec audit command and output it result data
 func CollectData(cmd *cobra.Command, target string) error {
@@ -65,13 +54,13 @@ func CollectData(cmd *cobra.Command, target string) error {
 	}
 	specName := cmd.Flag("spec").Value.String()
 	specVersion := cmd.Flag("version").Value.String()
-	sv := SpecVersion{Name: specName, Version: specVersion}
-	if len(sv.Name) == 0 || len(sv.Version) == 0 {
-		sv = specByPlatfromVersion(p)
+	sv := fmt.Sprintf("%s-%s", specName, specVersion)
+	if len(specName) == 0 || len(specVersion) == 0 {
+		sv = specByPlatfromVersion(p, lp.VersionMapping)
 	}
 	for _, infoCollector := range infoCollectorMap {
 		nodeInfo := make(map[string]*Info)
-		if !(infoCollector.Version == sv.Version && infoCollector.Name == sv.Name) {
+		if fmt.Sprintf("%s-%s", infoCollector.Name, infoCollector.Version) != sv {
 			continue
 		}
 		for _, ci := range infoCollector.Collectors {
@@ -124,8 +113,26 @@ func loadNodeConfig(ctx context.Context, cluster Cluster, nodeName string) (map[
 	return nodeConfig, nil
 }
 
-func specByPlatfromVersion(platfrom Platform) SpecVersion {
-	return platfromSpec[fmt.Sprintf("%s-%s", platfrom.Name, platfrom.Version)]
+func specByPlatfromVersion(platfrom Platform, versionSpecMapper map[string][]SpecVersion) string {
+	speVersions, ok := versionSpecMapper[platfrom.Name]
+	if ok {
+		for _, cisVer := range speVersions {
+			c, err := semver.NewConstraint(fmt.Sprintf("%s %s", cisVer.Op, cisVer.Version))
+			if err != nil {
+				// default to basic k8s spec
+				return "k8s-cis-1.23.0"
+			}
+			v, err := semver.NewVersion(platfrom.Version)
+			if err != nil {
+				// default to basic k8s spec
+				return "k8s-cis-1.23.0"
+			}
+			if ok, _ = c.Validate(v); ok {
+				return cisVer.CisSpec
+			}
+		}
+	}
+	return "k8s-cis-1.23.0"
 }
 
 func getValuesFromkubeletConfig(nodeConfig map[string]interface{}, configMapper map[string]string) map[string]*Info {
