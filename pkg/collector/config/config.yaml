@@ -11,7 +11,6 @@ node:
       - /etc/kubernetes/manifests/talos-kube-apiserver.yaml
       - /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
     defaultconf: /etc/kubernetes/manifests/kube-apiserver.yaml
-
   controllermanager:
     confs:
       - /etc/kubernetes/manifests/kube-controller-manager.yaml
@@ -27,7 +26,6 @@ node:
       - /var/lib/kube-controller-manager/kubeconfig
       - /system/secrets/kubernetes/kube-controller-manager/kubeconfig
     defaultkubeconfig: /etc/kubernetes/controller-manager.conf
-
   scheduler:
     confs:
       - /etc/kubernetes/manifests/kube-scheduler.yaml
@@ -62,85 +60,73 @@ node:
       - /var/lib/rancher/k3s/server/db/etcd/config
     defaultconf: /etc/kubernetes/manifests/etcd.yaml
     defaultdatadir: /var/lib/etcd/default.etcd
-
   flanneld:
     defaultconf: /etc/sysconfig/flanneld
-
   kubernetes:
-    defaultconf: "/etc/kubernetes/config"
-
+    defaultconf: /etc/kubernetes/config
   kubelet:
     cafile:
-      - "/etc/kubernetes/pki/ca.crt"
-      - "/etc/kubernetes/certs/ca.crt"
-      - "/etc/kubernetes/cert/ca.pem"
-      - "/var/snap/microk8s/current/certs/ca.crt"
-      - "/var/lib/rancher/rke2/agent/server.crt"
-      - "/var/lib/rancher/rke2/agent/client-ca.crt"
-      - "/var/lib/rancher/k3s/agent/client-ca.crt"
+      - /etc/kubernetes/pki/ca.crt
+      - /etc/kubernetes/certs/ca.crt
+      - /etc/kubernetes/cert/ca.pem
+      - /var/snap/microk8s/current/certs/ca.crt
+      - /var/lib/rancher/rke2/agent/server.crt
+      - /var/lib/rancher/rke2/agent/client-ca.crt
+      - /var/lib/rancher/k3s/agent/client-ca.crt
     svc:
-      # These paths must also be included
-      #  in the 'confs' property below
-      - "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
-      - "/etc/systemd/system/kubelet.service"
-      - "/lib/systemd/system/kubelet.service"
-      - "/etc/systemd/system/snap.kubelet.daemon.service"
-      - "/etc/systemd/system/snap.microk8s.daemon-kubelet.service"
-      - "/etc/systemd/system/atomic-openshift-node.service"
-      - "/etc/systemd/system/origin-node.service"
+      - /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+      - /etc/systemd/system/kubelet.service
+      - /lib/systemd/system/kubelet.service
+      - /etc/systemd/system/snap.kubelet.daemon.service
+      - /etc/systemd/system/snap.microk8s.daemon-kubelet.service
+      - /etc/systemd/system/atomic-openshift-node.service
+      - /etc/systemd/system/origin-node.service
     bins:
-      - "hyperkube kubelet"
-      - "kubelet"
+      - hyperkube kubelet
+      - kubelet
     kubeconfig:
-      - "/etc/kubernetes/kubelet.conf"
-      - "/etc/kubernetes/kubelet-kubeconfig.conf"
-      - "/var/lib/kubelet/kubeconfig"
-      - "/etc/kubernetes/kubelet-kubeconfig"
-      - "/etc/kubernetes/kubelet/kubeconfig"
-      - "/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
-      - "/var/snap/microk8s/current/credentials/kubelet.config"
-      - "/etc/kubernetes/kubeconfig-kubelet"
-      - "/var/lib/rancher/rke2/agent/kubelet.kubeconfig"
-      - "/var/lib/rancher/k3s/server/cred/admin.kubeconfig"
-      - "/var/lib/rancher/k3s/agent/kubelet.kubeconfig"
+      - /etc/kubernetes/kubelet.conf
+      - /etc/kubernetes/kubelet-kubeconfig.conf
+      - /var/lib/kubelet/kubeconfig
+      - /etc/kubernetes/kubelet-kubeconfig
+      - /etc/kubernetes/kubelet/kubeconfig
+      - /etc/kubernetes/ssl/kubecfg-kube-node.yaml
+      - /var/snap/microk8s/current/credentials/kubelet.config
+      - /etc/kubernetes/kubeconfig-kubelet
+      - /var/lib/rancher/rke2/agent/kubelet.kubeconfig
+      - /var/lib/rancher/k3s/server/cred/admin.kubeconfig
+      - /var/lib/rancher/k3s/agent/kubelet.kubeconfig
     confs:
-      - "/etc/kubernetes/kubelet-config.yaml"
-      - "/var/lib/kubelet/config.yaml"
-      - "/var/lib/kubelet/config.yml"
-      - "/etc/kubernetes/kubelet/kubelet-config.json"
-      - "/etc/kubernetes/kubelet/config"
-      - "/home/kubernetes/kubelet-config.yaml"
-      - "/home/kubernetes/kubelet-config.yml"
-      - "/etc/default/kubeletconfig.json"
-      - "/etc/default/kubelet"
-      - "/var/lib/kubelet/kubeconfig"
-      - "/var/snap/kubelet/current/args"
-      - "/var/snap/microk8s/current/args/kubelet"
-      ## Due to the fact that the kubelet might be configured
-      ## without a kubelet-config file, we use a work-around
-      ## of pointing to the systemd service file (which can also
-      ## hold kubelet configuration).
-      ## Note: The following paths must match the one under 'svc'
-      - "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
-      - "/etc/systemd/system/kubelet.service"
-      - "/lib/systemd/system/kubelet.service"
-      - "/etc/systemd/system/snap.kubelet.daemon.service"
-      - "/etc/systemd/system/snap.microk8s.daemon-kubelet.service"
-      - "/etc/kubernetes/kubelet.yaml"
-      - "/var/lib/rancher/rke2/agent/kubelet.kubeconfig"
-
-    defaultconf: "/var/lib/kubelet/config.yaml"
-    defaultsvc: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
-    defaultkubeconfig: "/etc/kubernetes/kubelet.conf"
-    defaultcafile: "/etc/kubernetes/pki/ca.crt"
-
+      - /etc/kubernetes/kubelet-config.yaml
+      - /var/lib/kubelet/config.yaml
+      - /var/lib/kubelet/config.yml
+      - /etc/kubernetes/kubelet/kubelet-config.json
+      - /etc/kubernetes/kubelet/config
+      - /home/kubernetes/kubelet-config.yaml
+      - /home/kubernetes/kubelet-config.yml
+      - /etc/default/kubeletconfig.json
+      - /etc/default/kubelet
+      - /var/lib/kubelet/kubeconfig
+      - /var/snap/kubelet/current/args
+      - /var/snap/microk8s/current/args/kubelet
+      - /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+      - /etc/systemd/system/kubelet.service
+      - /lib/systemd/system/kubelet.service
+      - /etc/systemd/system/snap.kubelet.daemon.service
+      - /etc/systemd/system/snap.microk8s.daemon-kubelet.service
+      - /etc/kubernetes/kubelet.yaml
+      - /var/lib/rancher/rke2/agent/kubelet.kubeconfig
+    defaultconf: /var/lib/kubelet/config.yaml
+    defaultsvc: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    defaultkubeconfig: /etc/kubernetes/kubelet.conf
+    defaultcafile: /etc/kubernetes/pki/ca.crt
   proxy:
     bins:
-      - "kube-proxy"
-      - "hyperkube proxy"
-      - "hyperkube kube-proxy"
-      - "proxy"
-      - "openshift start network"
+      - kube-proxy
+      - hyperkube proxy
+      - hyperkube kube-proxy
+      - proxy
+      - openshift start network
     confs:
       - /etc/kubernetes/proxy
       - /etc/kubernetes/addons/kube-proxy-daemonset.yaml
@@ -148,46 +134,45 @@ node:
       - /var/snap/kube-proxy/current/args
       - /var/snap/microk8s/current/args/kube-proxy
     kubeconfig:
-      - "/etc/kubernetes/kubelet-kubeconfig"
-      - "/etc/kubernetes/kubelet-kubeconfig.conf"
-      - "/etc/kubernetes/kubelet/config"
-      - "/etc/kubernetes/ssl/kubecfg-kube-proxy.yaml"
-      - "/var/lib/kubelet/kubeconfig"
-      - "/var/snap/microk8s/current/credentials/proxy.config"
-      - "/var/lib/rancher/rke2/agent/kubeproxy.kubeconfig"
-      - "/var/lib/rancher/k3s/agent/kubeproxy.kubeconfig"
+      - /etc/kubernetes/kubelet-kubeconfig
+      - /etc/kubernetes/kubelet-kubeconfig.conf
+      - /etc/kubernetes/kubelet/config
+      - /etc/kubernetes/ssl/kubecfg-kube-proxy.yaml
+      - /var/lib/kubelet/kubeconfig
+      - /var/snap/microk8s/current/credentials/proxy.config
+      - /var/lib/rancher/rke2/agent/kubeproxy.kubeconfig
+      - /var/lib/rancher/k3s/agent/kubeproxy.kubeconfig
     svc:
-      - "/lib/systemd/system/kube-proxy.service"
-      - "/etc/systemd/system/snap.microk8s.daemon-proxy.service"
+      - /lib/systemd/system/kube-proxy.service
+      - /etc/systemd/system/snap.microk8s.daemon-proxy.service
     defaultconf: /etc/kubernetes/addons/kube-proxy-daemonset.yaml
-    defaultkubeconfig: "/etc/kubernetes/proxy.conf"
-
+    defaultkubeconfig: /etc/kubernetes/proxy.conf
 version_mapping:
   k8s:
-  - op: ">="
-    cluster_version: '1.21'
-    spec: k8s-cis-1.23.0
+    - op: ">="
+      cluster_version: "1.21"
+      spec: k8s-cis-1.23.0
   gke:
-  - op: ">="
-    cluster_version: '1.21'
-    spec: gke-cis-1.2.0
+    - op: ">="
+      cluster_version: "1.21"
+      spec: gke-cis-1.2.0
   eks:
-  - op: ">="
-    cluster_version: '1.21'
-    spec: eks-cis-1.2.0
+    - op: ">="
+      cluster_version: "1.21"
+      spec: eks-cis-1.2.0
   aks:
-  - op: ">="
-    cluster_version: '1.21'
-    spec: aks-cis-1.0
+    - op: ">="
+      cluster_version: "1.21"
+      spec: aks-cis-1.0
   rke2:
-  - op: ">="
-    cluster_version: '1.21'
-    spec: rke2-cis-1.24
+    - op: ">="
+      cluster_version: "1.21"
+      spec: rke2-cis-1.24
   microk8s:
-  - op: ">="
-    cluster_version: '1.21'
-    spec: microk8s-cis-1.24
+    - op: ">="
+      cluster_version: "1.21"
+      spec: microk8s-cis-1.24
   ocp:
-  - op: ">="
-    cluster_version: '4.0'
-    spec: rh-cis-1.0
+    - op: ">="
+      cluster_version: "4.0"
+      spec: rh-cis-1.0
