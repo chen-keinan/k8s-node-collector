@@ -9,9 +9,9 @@ import (
 
 func init() {
 	rootCmd.PersistentFlags().StringP("output", "o", "json", "Output format. One of table|json")
-	rootCmd.PersistentFlags().StringP("spec", "s", "", " spec name.")
-	rootCmd.PersistentFlags().StringP("version", "v", "", "spec version")
-	rootCmd.PersistentFlags().StringP("node", "n", "kind-control-plane", "node name.  default: kind-control-plane")
+	rootCmd.PersistentFlags().StringP("spec", "s", "", " spec name. example: k8s-cis")
+	rootCmd.PersistentFlags().StringP("version", "v", "", "spec version. example 1.23.0")
+	rootCmd.PersistentFlags().StringP("node", "n", "", "node name")
 }
 
 var rootCmd = &cobra.Command{

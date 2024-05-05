@@ -18,6 +18,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	// Version is the version of the output
+	defaultSpec = "k8s-cis-1.23.0"
+)
+
 // CollectData run spec audit command and output it result data
 func CollectData(cmd *cobra.Command, target string) error {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
@@ -120,19 +125,19 @@ func specByPlatfromVersion(platfrom Platform, versionSpecMapper map[string][]Spe
 			c, err := semver.NewConstraint(fmt.Sprintf("%s %s", cisVer.Op, cisVer.Version))
 			if err != nil {
 				// default to basic k8s spec
-				return "k8s-cis-1.23.0"
+				return defaultSpec
 			}
 			v, err := semver.NewVersion(platfrom.Version)
 			if err != nil {
 				// default to basic k8s spec
-				return "k8s-cis-1.23.0"
+				return defaultSpec
 			}
 			if ok, _ = c.Validate(v); ok {
 				return cisVer.CisSpec
 			}
 		}
 	}
-	return "k8s-cis-1.23.0"
+	return defaultSpec
 }
 
 func getValuesFromkubeletConfig(nodeConfig map[string]interface{}, configMapper map[string]string) map[string]*Info {
