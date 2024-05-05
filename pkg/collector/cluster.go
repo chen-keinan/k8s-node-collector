@@ -84,15 +84,10 @@ func (cluster *Cluster) Platfrom() (Platform, error) {
 		name = "eks"
 	case strings.Contains(nodeName, "gke"):
 		name = "gke"
-	case strings.Contains(nodeName, "ocp"):
-		name = "ocp"
 	default:
 		name = "k8s"
 	}
-	if len(p.Version) != 0 {
-		return Platform{Name: name, Version: majorVersion(p.Version)}, nil
-	}
-	return p, nil
+	return Platform{Name: name, Version: p.Version}, nil
 }
 
 func getPlatformInfoFromVersion(s string) Platform {
@@ -101,7 +96,7 @@ func getPlatformInfoFromVersion(s string) Platform {
 	if len(subs) < 3 {
 		return Platform{
 			Name:    "k8s",
-			Version: s,
+			Version: majorVersion(s),
 		}
 	}
 	return Platform{
