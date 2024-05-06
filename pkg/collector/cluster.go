@@ -17,6 +17,17 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+const (
+	native   = "k8s"
+	gke      = "gke"
+	aks      = "aks"
+	eks      = "eks"
+	rke2     = "rke2"
+	k3s      = "k3s"
+	ocp      = "ocp"
+	microk8s = "microk8s"
+)
+
 type Cluster struct {
 	clientSet     *kubernetes.Clientset
 	cConfig       clientcmd.ClientConfig
@@ -72,18 +83,18 @@ func (cluster *Cluster) Platfrom() (Platform, error) {
 	p := getPlatformInfoFromVersion(semVersion.GitVersion)
 	var name string
 	switch {
-	case strings.Contains(p.Version, "k3s"):
-		name = "k3s"
-	case strings.Contains(p.Version, "rke2"):
-		name = "rke2"
-	case strings.Contains(p.Version, "microk8s"):
-		name = "microk8s"
-	case strings.Contains(nodeName, "aks"):
-		name = "aks"
-	case strings.Contains(nodeName, "eks"):
-		name = "eks"
-	case strings.Contains(nodeName, "gke"):
-		name = "gke"
+	case strings.Contains(p.Version, k3s):
+		name = k3s
+	case strings.Contains(p.Version, rke2):
+		name = rke2
+	case strings.Contains(p.Version, microk8s):
+		name = microk8s
+	case strings.Contains(nodeName, aks):
+		name = aks
+	case strings.Contains(nodeName, eks):
+		name = eks
+	case strings.Contains(nodeName, gke):
+		name = gke
 	default:
 		name = "k8s"
 	}
