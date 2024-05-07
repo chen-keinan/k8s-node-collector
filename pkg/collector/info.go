@@ -23,8 +23,8 @@ var config embed.FS
 var params embed.FS
 
 // LoadConfig load audit commands specification from config file
-func LoadConfig(target string, configMap map[string]string) (map[string]*SpecInfo, error) {
-	fullPath := fmt.Sprintf("%s/%s", configFolder, target)
+func LoadConfig(configMap map[string]string) (map[string]*SpecInfo, error) {
+	fullPath := fmt.Sprintf("%s/%s", configFolder, "specs")
 	dirEntries, err := config.ReadDir(fullPath)
 	if err != nil {
 		return nil, err

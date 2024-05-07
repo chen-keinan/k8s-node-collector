@@ -19,7 +19,7 @@ var k8sCmd = &cobra.Command{
 	Long:  `A tool which provide a way to extract k8s info which is not accessible via apiserver from node cluster based on pre-define commands`,
 	RunE: func() func(cmd *cobra.Command, args []string) error {
 		return func(cmd *cobra.Command, args []string) error {
-			return collector.CollectData(cmd, subCommandK8s)
+			return collector.CollectData(cmd)
 		}
 	}(),
 }

@@ -12,6 +12,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("spec", "s", "", " spec name. example: k8s-cis")
 	rootCmd.PersistentFlags().StringP("version", "v", "", "spec version. example 1.23.0")
 	rootCmd.PersistentFlags().StringP("node", "n", "", "node name")
+	rootCmd.PersistentFlags().StringP("kubelet-config", "", "", "kubelet config via api /api/v1/nodes/<>/proxy/configz encoded in base64")
 }
 
 var rootCmd = &cobra.Command{

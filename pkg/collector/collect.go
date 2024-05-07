@@ -2,6 +2,7 @@ package collector
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"os"
@@ -24,9 +25,8 @@ const (
 )
 
 // CollectData run spec audit command and output it result data
-func CollectData(cmd *cobra.Command, target string) error {
+func CollectData(cmd *cobra.Command) error {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-
 	cluster, err := GetCluster()
 	if err != nil {
 		return err
@@ -53,12 +53,13 @@ func CollectData(cmd *cobra.Command, target string) error {
 		return err
 	}
 	cm := configParams(lp, shellCmd)
-	infoCollectorMap, err := LoadConfig(target, cm)
+	infoCollectorMap, err := LoadConfig(cm)
 	if err != nil {
 		return err
 	}
 	specName := cmd.Flag("spec").Value.String()
 	specVersion := cmd.Flag("version").Value.String()
+	kubeletConfig := cmd.Flag("kubelet-config").Value.String()
 	sv := fmt.Sprintf("%s-%s", specName, specVersion)
 	if len(specName) == 0 || len(specVersion) == 0 {
 		sv = specByPlatfromVersion(p, lp.VersionMapping)
@@ -80,8 +81,8 @@ func CollectData(cmd *cobra.Command, target string) error {
 			nodeInfo[ci.Key] = &Info{Values: values}
 		}
 		nodeName := cmd.Flag("node").Value.String()
-		if nodeName != "" {
-			nodeConfig, err := loadNodeConfig(ctx, *cluster, nodeName)
+		if nodeName != "" || kubeletConfig != "" {
+			nodeConfig, err := loadNodeConfig(ctx, *cluster, nodeName, kubeletConfig)
 			if err == nil {
 				mapping, err := LoadKubeletMapping()
 				if err != nil {
@@ -107,8 +108,14 @@ func CollectData(cmd *cobra.Command, target string) error {
 	return nil
 }
 
-func loadNodeConfig(ctx context.Context, cluster Cluster, nodeName string) (map[string]interface{}, error) {
-	data, err := cluster.clientSet.RESTClient().Get().AbsPath(fmt.Sprintf("/api/v1/nodes/%s/proxy/configz", nodeName)).DoRaw(ctx)
+func loadNodeConfig(ctx context.Context, cluster Cluster, nodeName string, kubeletConfig string) (map[string]interface{}, error) {
+	var data []byte
+	var err error
+	if kubeletConfig != "" {
+		data, err = base64.StdEncoding.DecodeString(kubeletConfig)
+	} else {
+		data, err = cluster.clientSet.RESTClient().Get().AbsPath(fmt.Sprintf("/api/v1/nodes/%s/proxy/configz", nodeName)).DoRaw(ctx)
+	}
 	if err != nil {
 		return nil, err
 	}
