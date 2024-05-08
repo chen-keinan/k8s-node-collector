@@ -14,11 +14,12 @@ The node-collector executes a collector specification,example [k8s-cis-1.23.0](.
 Each specification must include:
 
 - `name:` any other platfrom used, example (k8s-cis, aks-cis, gke-cis and etc)
+
 - `version:` of the cis-benchmark it represent (example: 1.23.0)
 
-for executing a specific spec need to pass the `--spec k8s-cis` and `--version 1.23.0` flags
+for executing a specific spec need to pass the `--spec-name k8s-cis` and `--spec-version 1.23.0` flags
 
-If no collector spec has been specified. the node-collector will try to auto detect the matching spec by platrom type and version as define in [version_mapping data](./pkg/collector/config/config.yaml)
+If no collector spec has been specified. the node-collector will try to auto detect the matching spec by platform type and version as define in [version_mapping data](./pkg/collector/config/config.yaml)
 example:  
 
 ```yaml
@@ -31,13 +32,18 @@ k8s:
     spec: k8s-cis-1.23.0
 ```
 
+you can use the `cluster-version` flag in case you do not know what cis spec is supported for you cluster.
+this option must be used in conjantion with `spec-name` flag and the matching spec version will be auto detected
+example:|
+`--spec-name k8s-cis` `--cluster-version 1.23.1`
+
 In the example provided, there are two rules; the first matching rule will obtain the appropriate specification.
 Any native k8s cluser with version equal to 1.21 will obtain the `k8s-cis-1.21.0` collector specification it no match found
 any native k8s cluser with version grather to 1.21 will obtain the `k8s-cis-1.23.0`
 
 ## Adding new collector specifications
 
-In order to Add a new specifications, add a new yaml file to this path : `.pkg/collector/config/specs/`
+In order to add a new specifications, put a new yaml file to this path : `.pkg/collector/config/specs/`
 with the following file naming convesion <`platform`-`cis`-`spec_version`>
 example: `gke-cis-1.24.0`
 
@@ -47,7 +53,7 @@ Each collector specification audit includes the following fields
 ---
 version: "1.23.0"
 name: aks-cis
-title: Node Specification for info collector
+title: Node Specification for AKS info collector
 collectors:
   - key: < name to hold the audit command output>
     title: <title of the audit command>
@@ -58,19 +64,24 @@ collectors:
 ### General spec data
 
 `name`    - name of the spec (example: `aks-cis`)
+
 `version` - version of the spec (example: `1.23.0`)
+
 `title`   - short description of the overall spec
 
 ### Specific audit data
 
 `key`      - parameter name to hold the audit shell command output
+
 `title`    - title of the audit shell command
+
 `nodeType` - define the node type on which shell command should be executed (master | worker)
+
 `audit`    - a shell command that collect information and return the result (errors must be supressed)
 
 ## Config file
 
-The k8s-node-collector use a config file which help to obtain binaries and config files path based on different platfrom (rancher, natinv k8s and etc)
+The k8s-node-collector use a config file which help to obtain binaries and config files path based on different platfrom (rancher, native k8s and etc)
 for example:
 
 ```yaml
