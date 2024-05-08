@@ -39,10 +39,6 @@ func CollectData(cmd *cobra.Command) error {
 			log.Println("Increase --timeout value")
 		}
 	}()
-	p, err := cluster.Platfrom()
-	if err != nil {
-		return err
-	}
 	shellCmd := NewShellCmd()
 	nodeType, err := shellCmd.FindNodeType()
 	if err != nil {
@@ -57,12 +53,9 @@ func CollectData(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	specName := cmd.Flag("spec").Value.String()
-	specVersion := cmd.Flag("version").Value.String()
-	kubeletConfig := cmd.Flag("kubelet-config").Value.String()
-	sv := fmt.Sprintf("%s-%s", specName, specVersion)
-	if len(specName) == 0 || len(specVersion) == 0 {
-		sv = specByPlatfromVersion(p, lp.VersionMapping)
+	sv, err := specID(cmd, cluster, lp)
+	if err != nil {
+		return err
 	}
 	for _, infoCollector := range infoCollectorMap {
 		nodeInfo := make(map[string]*Info)
@@ -81,6 +74,7 @@ func CollectData(cmd *cobra.Command) error {
 			nodeInfo[ci.Key] = &Info{Values: values}
 		}
 		nodeName := cmd.Flag("node").Value.String()
+		kubeletConfig := cmd.Flag("kubelet-config").Value.String()
 		if nodeName != "" || kubeletConfig != "" {
 			nodeConfig, err := loadNodeConfig(ctx, *cluster, nodeName, kubeletConfig)
 			if err == nil {
@@ -106,6 +100,29 @@ func CollectData(cmd *cobra.Command) error {
 		}
 	}
 	return nil
+}
+
+func specID(cmd *cobra.Command, cluster *Cluster, lp *Config) (string, error) {
+	specName := cmd.Flag("spec-name").Value.String()
+	specVersion := cmd.Flag("spec-version").Value.String()
+	clusterVersion := cmd.Flag("cluster-version").Value.String()
+	switch {
+	case specName != "" && specVersion != "":
+		return fmt.Sprintf("%s-%s", specName, specVersion), nil
+	case specName != "" && clusterVersion != "":
+		return specByPlatfromVersion(
+			Platform{
+				Name:    strings.TrimSuffix(specName, "-cis"),
+				Version: majorVersion(clusterVersion),
+			},
+			lp.VersionMapping), nil
+	default: // auto detect spec by platform type (k8s, aks, eks and etc) and version
+		p, err := cluster.Platfrom()
+		if err != nil {
+			return "", err
+		}
+		return specByPlatfromVersion(p, lp.VersionMapping), nil
+	}
 }
 
 func loadNodeConfig(ctx context.Context, cluster Cluster, nodeName string, kubeletConfig string) (map[string]interface{}, error) {

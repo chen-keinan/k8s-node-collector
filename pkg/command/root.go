@@ -9,8 +9,9 @@ import (
 
 func init() {
 	rootCmd.PersistentFlags().StringP("output", "o", "json", "Output format. One of table|json")
-	rootCmd.PersistentFlags().StringP("spec", "s", "", " spec name. example: k8s-cis")
-	rootCmd.PersistentFlags().StringP("version", "v", "", "spec version. example 1.23.0")
+	rootCmd.PersistentFlags().StringP("spec-name", "s", "", "spec name. example: k8s-cis")
+	rootCmd.PersistentFlags().StringP("spec-version", "v", "", "spec version. example 1.23.0")
+	rootCmd.PersistentFlags().StringP("cluster-version", "c", "", "cluser version. example 1.23.0")
 	rootCmd.PersistentFlags().StringP("node", "n", "", "node name")
 	rootCmd.PersistentFlags().StringP("kubelet-config", "", "", "kubelet config via api /api/v1/nodes/<>/proxy/configz encoded in base64")
 }
