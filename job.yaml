@@ -53,11 +53,13 @@ spec:
       serviceAccountName: node-collector
       containers:
         - name: node-collector
-          image: ghcr.io/aquasecurity/node-collector:0.1.1
+          image: ghcr.io/aquasecurity/node-collector:0.2.0
           command:
             - node-collector
           args:
             - k8s
+            - --node
+            - kind-control-plane
           resources:
             limits:
               cpu: 100m

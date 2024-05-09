@@ -8,6 +8,20 @@
 
 The k8s-Node-collector is an open-source collector that gathers Node information (file system and process data) from Kubernetes nodes and outputs it in a JSON format.
 
+## Installation
+
+```sh
+git clone git@github.com:aquasecurity/k8s-node-collector.git
+cd k8s-node-collector/cmd/node-collector
+GOOS=linux GOARCH=arm64 go build -o node-collector main.go
+```
+
+## Executing node-collector binary
+
+```sh
+./node-collector k8s
+```
+
 ## Executing Collector specifications
 
 The node-collector executes a collector specification,example [k8s-cis-1.23.0](./pkg/collector/config/specs/k8s-cis-1.23.0.yaml).
