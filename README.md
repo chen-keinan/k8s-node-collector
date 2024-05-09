@@ -19,6 +19,29 @@ GOOS=linux GOARCH=arm64 go build -o node-collector main.go
 ## Executing node-collector binary
 
 ```sh
+Usage:
+  node-collector [flags]
+  node-collector [command]
+
+Examples:
+node-collector k8s [flags]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  help        Help about any command
+  k8s         k8s-node-collector extract file system info from cluster Node
+
+Flags:
+  -c, --cluster-version string   cluser version. example 1.23.0
+  -h, --help                     help for node-collector
+      --kubelet-config string    kubelet config via api /api/v1/nodes/<>/proxy/configz encoded in base64
+  -n, --node string              node name
+  -o, --output string            Output format. One of table|json (default "json")
+  -s, --spec-name string         spec name. example: k8s-cis
+  -v, --spec-version string      spec version. example 1.23.0
+  ```
+
+```sh
 ./node-collector k8s
 ```
 
