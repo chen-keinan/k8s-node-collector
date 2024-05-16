@@ -46,7 +46,7 @@ Each commit message doesn't have to follow conventions as long as it is clear an
 
 - Install Go
 
-   The project requires [Go 1.22.2][go-download] or later. We also assume that you're familiar with
+   The project requires [Go 1.22.3][go-download] or later. We also assume that you're familiar with
    Go's [GOPATH workspace][go-code] convention, and have the appropriate environment variables set.
 - Get the source code:
 
