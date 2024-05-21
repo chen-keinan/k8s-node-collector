@@ -19,12 +19,12 @@ spec:
       600 or more restrictive
     description: Ensure that the API server pod specification file has permissions
       of 600 or more restrictive
-    audit:
-      checks:
-      - id: AVD-KCV-0073
-      commands:
-      - id: CMD-0001
+    checks:
+    - id: AVD-KCV-0073
+    commands:
+    - id: CMD-0001
     severity: HIGH
+
 ```
 
 ### Command Field
