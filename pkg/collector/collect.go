@@ -17,6 +17,7 @@ import (
 
 	"github.com/Masterminds/semver"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -106,7 +107,7 @@ func GetNodesCommands(nodeCommands string, infoCollectorMap map[string]*SpecInfo
 		if err != nil {
 			return nil, err
 		}
-		err = json.Unmarshal(base64Commands, &commands)
+		err = yaml.Unmarshal(base64Commands, &commands)
 		if err != nil {
 			return nil, err
 		}
