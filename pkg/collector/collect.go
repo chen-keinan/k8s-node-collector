@@ -77,7 +77,8 @@ func CollectData(cmd *cobra.Command) error {
 	if nodeName != "" || kubeletConfig != "" {
 		nodeConfig, err := loadNodeConfig(ctx, *cluster, nodeName, kubeletConfig)
 		if err == nil {
-			mapping, err := LoadKubeletMapping()
+			kubeletConfigMapping := cmd.Flag("kubelet-config-mapping").Value.String()
+			mapping, err := LoadKubeletMapping(kubeletConfigMapping)
 			if err != nil {
 				return err
 			}
@@ -102,15 +103,17 @@ func CollectData(cmd *cobra.Command) error {
 
 func GetNodesCommands(nodeCommands string, infoCollectorMap map[string]*SpecInfo, nodeType string, sv string) ([]Command, error) {
 	var commands []Command
+	var specInfo SpecInfo
 	if nodeCommands != "" {
 		base64Commands, err := base64.StdEncoding.DecodeString(nodeCommands)
 		if err != nil {
 			return nil, err
 		}
-		err = yaml.Unmarshal(base64Commands, &commands)
+		err = yaml.Unmarshal(base64Commands, &specInfo)
 		if err != nil {
 			return nil, err
 		}
+		commands = specInfo.Commands
 	} else {
 		for _, infoCollector := range infoCollectorMap {
 			if fmt.Sprintf("%s-%s", infoCollector.Name, infoCollector.Version) == sv {

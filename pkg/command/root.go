@@ -17,6 +17,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("spec-version-mapping", "", "", "k8s spec-version mapping encoded to base64")
 	rootCmd.PersistentFlags().StringP("node-config", "", "", "k8s node file config encoded to base64")
 	rootCmd.PersistentFlags().StringP("node-commands", "", "", "k8s node commands to be executed encoded to base64")
+	rootCmd.PersistentFlags().StringP("kubelet-config-mapping", "", "", "kubelet config api mapping encoded to base64")
 }
 
 var rootCmd = &cobra.Command{

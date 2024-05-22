@@ -73,11 +73,20 @@ func LoadConfigParams(nodeFileconfig, specVersionMapping string) (*Config, *Mapp
 	return getNodeParams(string(decodedNodeFileconfig), string(decodedspecVersionMapping))
 }
 
-func LoadKubeletMapping() (map[string]string, error) {
-	fullPath := fmt.Sprintf("%s/%s", configFolder, "kubeletconfig-mapping.yaml")
-	fContent, err := params.ReadFile(fullPath)
-	if err != nil {
-		return nil, err
+func LoadKubeletMapping(kubletConfigMapping string) (map[string]string, error) {
+	var fContent []byte
+	var err error
+	if len(kubletConfigMapping) > 0 {
+		fContent, err = base64.StdEncoding.DecodeString(kubletConfigMapping)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		fullPath := fmt.Sprintf("%s/%s", configFolder, "kubeletconfig-mapping.yaml")
+		fContent, err = params.ReadFile(fullPath)
+		if err != nil {
+			return nil, err
+		}
 	}
 	mapping := make(map[string]string)
 	err = yaml.Unmarshal(fContent, &mapping)

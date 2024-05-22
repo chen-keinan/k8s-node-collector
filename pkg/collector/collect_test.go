@@ -3,6 +3,7 @@ package collector
 import (
 	"encoding/json"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -57,7 +58,7 @@ func TestParseNodeConfig(t *testing.T) {
 			nodeConfig := make(map[string]interface{})
 			err = json.Unmarshal(data, &nodeConfig)
 			assert.NoError(t, err)
-			mapping, err := LoadKubeletMapping()
+			mapping, err := LoadKubeletMapping("")
 			assert.NoError(t, err)
 			m := getValuesFromkubeletConfig(nodeConfig, mapping)
 			for k, v := range m {
@@ -169,6 +170,35 @@ func TestPlatfromVersion(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := getPlatformInfoFromVersion(tt.version)
 			assert.Equal(t, got.Version, tt.want)
+		})
+	}
+}
+
+func TestNodeCommamnd(t *testing.T) {
+	tests := []struct {
+		name     string
+		commands string
+		want     []Command
+	}{
+		{
+			name:     "k8s version",
+			commands: "LS0tCmNvbW1hbmRzOgogIC0ga2V5OiBrdWJlQVBJU2VydmVyU3BlY0ZpbGVQZXJtaXNzaW9uCiAgICB0aXRsZTogQVBJIHNlcnZlciBwb2Qgc3BlY2lmaWNhdGlvbiBmaWxlIHBlcm1pc3Npb25zCiAgICBub2RlVHlwZTogbWFzdGVyCiAgICBhdWRpdDogc3RhdCAtYyAlYSAkYXBpc2VydmVyLmNvbmZzCgo=",
+			want: []Command{
+				{
+					Key:      "kubeAPIServerSpecFilePermission",
+					Title:    "API server pod specification file permissions",
+					NodeType: "master",
+					Audit:    "stat -c %a $apiserver.confs",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetNodesCommands(tt.commands, nil, "worker", "k8s-cis-1.23.2")
+			assert.NoError(t, err)
+			assert.True(t, reflect.DeepEqual(got, tt.want))
 		})
 	}
 }
