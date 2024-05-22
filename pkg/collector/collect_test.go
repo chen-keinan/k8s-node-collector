@@ -118,10 +118,10 @@ func TestSpecByVersionName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f, err := os.ReadFile(tt.versionMappingfile)
 			assert.NoError(t, err)
-			var config Config
-			err = yaml.Unmarshal(f, &config)
+			var mapper Mapper
+			err = yaml.Unmarshal(f, &mapper)
 			assert.NoError(t, err)
-			gotSpec := specByPlatfromVersion(tt.platfrom, config.VersionMapping)
+			gotSpec := specByPlatfromVersion(tt.platfrom, mapper.VersionMapping)
 			assert.Equal(t, gotSpec, tt.wantSpec)
 		})
 	}

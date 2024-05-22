@@ -13,7 +13,10 @@ func init() {
 	rootCmd.PersistentFlags().StringP("spec-version", "v", "", "spec version. example 1.23.0")
 	rootCmd.PersistentFlags().StringP("cluster-version", "c", "", "cluser version. example 1.23.0")
 	rootCmd.PersistentFlags().StringP("node", "n", "", "node name")
-	rootCmd.PersistentFlags().StringP("kubelet-config", "", "", "kubelet config via api /api/v1/nodes/<>/proxy/configz encoded in base64")
+	rootCmd.PersistentFlags().StringP("kubelet-config", "", "", "kubelet config via api /api/v1/nodes/<>/proxy/configz encoded to base64")
+	rootCmd.PersistentFlags().StringP("spec-version-mapping", "", "", "k8s spec-version mapping encoded to base64")
+	rootCmd.PersistentFlags().StringP("node-config", "", "", "k8s node file config encoded to base64")
+	rootCmd.PersistentFlags().StringP("node-commands", "", "", "k8s node commands to be executed encoded to base64")
 }
 
 var rootCmd = &cobra.Command{

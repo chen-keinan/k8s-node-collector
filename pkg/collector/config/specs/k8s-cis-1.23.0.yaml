@@ -2,7 +2,7 @@
 version: "1.23.0"
 name: k8s-cis
 title: Node Specification for info collector
-collectors:
+commands:
   - key: kubeAPIServerSpecFilePermission
     title: API server pod specification file permissions
     nodeType: master

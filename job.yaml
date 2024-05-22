@@ -53,7 +53,7 @@ spec:
       serviceAccountName: node-collector
       containers:
         - name: node-collector
-          image: ghcr.io/aquasecurity/node-collector:0.2.0
+          image: ghcr.io/aquasecurity/node-collector:0.2.1
           command:
             - node-collector
           args:
