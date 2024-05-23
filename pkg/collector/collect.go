@@ -192,7 +192,7 @@ func specByPlatfromVersion(platfrom Platform, versionSpecMapper map[string][]Spe
 				return defaultSpec
 			}
 			if ok, _ = c.Validate(v); ok {
-				return cisVer.CisSpec
+				return fmt.Sprintf("%s-%s", cisVer.CisSpecName, cisVer.CisSpecVersion)
 			}
 		}
 	}

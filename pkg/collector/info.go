@@ -156,10 +156,11 @@ type Mapper struct {
 	VersionMapping map[string][]SpecVersion `yaml:"version_mapping"`
 }
 type SpecVersion struct {
-	Name    string
-	Version string `yaml:"cluster_version"`
-	Op      string `yaml:"op"`
-	CisSpec string `yaml:"spec"`
+	Name           string
+	Version        string `yaml:"cluster_version"`
+	Op             string `yaml:"op"`
+	CisSpecName    string `yaml:"spec_name"`
+	CisSpecVersion string `yaml:"spec_version"`
 }
 type NodeParams struct {
 	APIserver         Params            `yaml:"apiserver"`
