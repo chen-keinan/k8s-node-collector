@@ -1,11 +1,14 @@
 package collector
 
 import (
+	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"os"
 	"reflect"
 	"testing"
 
+	"github.com/dsnet/compress/bzip2"
 	"github.com/stretchr/testify/assert"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -14,11 +17,13 @@ func TestParseNodeConfig(t *testing.T) {
 	tests := []struct {
 		name                   string
 		nodeConfigFile         string
+		mappingFile            string
 		expectedNodeConfigFile map[string]*Info
 	}{
 		{
 			name:           "parse node config",
 			nodeConfigFile: "./testdata/fixture/node_config.json",
+			mappingFile:    "./testdata/fixture/kubeletconfig-mapping.yaml",
 			expectedNodeConfigFile: map[string]*Info{
 				"kubeletAnonymousAuthArgumentSet": {
 					Values: []interface{}{"false"},
@@ -58,7 +63,12 @@ func TestParseNodeConfig(t *testing.T) {
 			nodeConfig := make(map[string]interface{})
 			err = json.Unmarshal(data, &nodeConfig)
 			assert.NoError(t, err)
-			mapping, err := LoadKubeletMapping("QlpoOTFBWSZTWRI2lT4AABtfgAAQWAfiNS+q/gA/79/wQAH1NxTuYaCmU09Ieo00ek9RoNAAGg0Epoppop5Eep+qNAeoGmjQPTSDQSSoaaek/VPU0ADQAAAAEkRAU8apsJMRoGjTQAPU9TcRXr86hZoteI/I2xvvr+qjmYb5eywfOzdw20qKFKDyTK+y+UVQlMiNJbY1T6P1unARCw9VNa/FDzMKZmhoyMSDEiqjQPhrffDzOcTiBP5D5e9ZcVSQbFkmZrdMO0E5nJdnKswNeV05HRGheGqz+OkvOsQ+SNzM/wdP+EljWhKpZ2s6FPMBKQ4ooKM5WbC1MbJni7FGg4dUVHNjB5jcaTn2QIISxqyNxcCkMWwIZnaL4Lle0jr4vMCYErt1RtISC8Amd2EmT7OcFGy4ZWjJiWsIFowOAMZp2XAnxMhVFCGZwkInZCZCliWxlXZXxp8SkQlpjctTMw0jFSyk8QVo5HxHKhWUUl5EApTfyYmz76vSgrSCglssOTQwoEwBdgTE0dp5k/BMVlg+oeZ5RamSfpwhQ4rgr4yRdQH0gFjDQ4MbhYbAwAQxJCV6K9WSlGMkw5wV9WqJoZnh4EQdQ7QkgQMmt0A7DUAcvdrMEJEy0LiTcQlc07o9NhpJ8gXEYAjA6AV+oNcU3TgaZYE98KfZySyKLaz/F3JFOFCQEjaVPg==")
+			mf, err := os.ReadFile(tt.mappingFile)
+			assert.NoError(t, err)
+			bzip2CompressData, err := bzip2Compress(mf)
+			assert.NoError(t, err)
+			encodedMapping := base64.StdEncoding.EncodeToString(bzip2CompressData)
+			mapping, err := LoadKubeletMapping(encodedMapping)
 			assert.NoError(t, err)
 			m := getValuesFromkubeletConfig(nodeConfig, mapping)
 			for k, v := range m {
@@ -68,6 +78,21 @@ func TestParseNodeConfig(t *testing.T) {
 			}
 		})
 	}
+}
+
+func bzip2Compress(data []byte) ([]byte, error) {
+	var buf bytes.Buffer
+	w, err := bzip2.NewWriter(&buf, &bzip2.WriterConfig{Level: bzip2.DefaultCompression})
+	if err != nil {
+		return []byte{}, err
+	}
+
+	_, err = w.Write(data)
+	if err != nil {
+		return []byte{}, err
+	}
+	w.Close()
+	return buf.Bytes(), nil
 }
 
 func TestSpecByVersionName(t *testing.T) {
