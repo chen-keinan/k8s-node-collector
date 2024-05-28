@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -46,25 +47,13 @@ func CollectData(cmd *cobra.Command) error {
 		return err
 	}
 	nodeFileconfig := cmd.Flag("node-config").Value.String()
-	specVersionMapping := cmd.Flag("spec-version-mapping").Value.String()
-	lp, mp, err := LoadConfigParams(nodeFileconfig, specVersionMapping)
+	lp, err := LoadConfigParams(nodeFileconfig)
 	if err != nil {
 		return err
 	}
 	cm := configParams(lp, shellCmd)
-	infoCollectorMap, err := LoadConfig(cm)
-	if err != nil {
-		return err
-	}
-	specName := cmd.Flag("spec-name").Value.String()
-	specVersion := cmd.Flag("spec-version").Value.String()
-	clusterVersion := cmd.Flag("cluster-version").Value.String()
-	sv, err := specID(specName, specVersion, clusterVersion, cluster, mp)
-	if err != nil {
-		return err
-	}
 	nodeCommands := cmd.Flag("node-commands").Value.String()
-	commands, err := GetNodesCommands(nodeCommands, infoCollectorMap, nodeType, sv)
+	commands, err := GetNodesCommands(nodeCommands, cm, nodeType)
 	if len(commands) == 0 {
 		return fmt.Errorf("spec not found")
 	}
@@ -101,26 +90,35 @@ func CollectData(cmd *cobra.Command) error {
 	return nil
 }
 
-func GetNodesCommands(nodeCommands string, infoCollectorMap map[string]*SpecInfo, nodeType string, sv string) ([]Command, error) {
+func GetNodesCommands(nodeCommands string, configMap map[string]string, nodeType string) ([]Command, error) {
 	var commands []Command
 	var specInfo SpecInfo
 	if nodeCommands != "" {
-		base64Commands, err := base64.StdEncoding.DecodeString(nodeCommands)
+		reader, err := ReadCompressData(io.NopCloser(strings.NewReader(nodeCommands)))
+		if err != nil {
+			fmt.Println("failed to read node commands")
+			return nil, err
+		}
+		fContent, err := io.ReadAll(reader)
 		if err != nil {
 			return nil, err
 		}
-		err = yaml.Unmarshal(base64Commands, &specInfo)
+		updatedContent := string(fContent)
+		for k, v := range configMap {
+			updatedContent = strings.ReplaceAll(updatedContent, k, v)
+		}
+		err = yaml.Unmarshal([]byte(updatedContent), &specInfo)
 		if err != nil {
 			return nil, err
 		}
-		commands = specInfo.Commands
-	} else {
-		for _, infoCollector := range infoCollectorMap {
-			if fmt.Sprintf("%s-%s", infoCollector.Name, infoCollector.Version) == sv {
-				commands = infoCollector.Commands
-				break
+		for _, c := range specInfo.Commands {
+			if nodeType == "master" {
+				commands = append(commands, c)
+			} else if c.NodeType == nodeType {
+				commands = append(commands, c)
 			}
 		}
+		commands = specInfo.Commands
 	}
 	return commands, nil
 }
@@ -136,26 +134,6 @@ func ExecuteCommands(shellCmd Shell, ci []Command) (map[string]*Info, error) {
 		nodeInfo[c.Key] = &Info{Values: values}
 	}
 	return nodeInfo, nil
-}
-
-func specID(specName, specVersion, clusterVersion string, cluster *Cluster, mp *Mapper) (string, error) {
-	switch {
-	case specName != "" && specVersion != "":
-		return fmt.Sprintf("%s-%s", specName, specVersion), nil
-	case specName != "" && clusterVersion != "":
-		return specByPlatfromVersion(
-			Platform{
-				Name:    strings.TrimSuffix(specName, "-cis"),
-				Version: majorVersion(clusterVersion),
-			},
-			mp.VersionMapping), nil
-	default: // auto detect spec by platform type (k8s, aks, eks and etc) and version
-		p, err := cluster.Platfrom()
-		if err != nil {
-			return "", err
-		}
-		return specByPlatfromVersion(p, mp.VersionMapping), nil
-	}
 }
 
 func loadNodeConfig(ctx context.Context, cluster Cluster, nodeName string, kubeletConfig string) (map[string]interface{}, error) {

@@ -14,12 +14,12 @@ func TestParseNodeConfig(t *testing.T) {
 	tests := []struct {
 		name                   string
 		nodeConfigFile         string
-		expextedNodeConfigFile map[string]*Info
+		expectedNodeConfigFile map[string]*Info
 	}{
 		{
 			name:           "parse node config",
 			nodeConfigFile: "./testdata/fixture/node_config.json",
-			expextedNodeConfigFile: map[string]*Info{
+			expectedNodeConfigFile: map[string]*Info{
 				"kubeletAnonymousAuthArgumentSet": {
 					Values: []interface{}{"false"},
 				},
@@ -58,12 +58,12 @@ func TestParseNodeConfig(t *testing.T) {
 			nodeConfig := make(map[string]interface{})
 			err = json.Unmarshal(data, &nodeConfig)
 			assert.NoError(t, err)
-			mapping, err := LoadKubeletMapping("")
+			mapping, err := LoadKubeletMapping("QlpoOTFBWSZTWRI2lT4AABtfgAAQWAfiNS+q/gA/79/wQAH1NxTuYaCmU09Ieo00ek9RoNAAGg0Epoppop5Eep+qNAeoGmjQPTSDQSSoaaek/VPU0ADQAAAAEkRAU8apsJMRoGjTQAPU9TcRXr86hZoteI/I2xvvr+qjmYb5eywfOzdw20qKFKDyTK+y+UVQlMiNJbY1T6P1unARCw9VNa/FDzMKZmhoyMSDEiqjQPhrffDzOcTiBP5D5e9ZcVSQbFkmZrdMO0E5nJdnKswNeV05HRGheGqz+OkvOsQ+SNzM/wdP+EljWhKpZ2s6FPMBKQ4ooKM5WbC1MbJni7FGg4dUVHNjB5jcaTn2QIISxqyNxcCkMWwIZnaL4Lle0jr4vMCYErt1RtISC8Amd2EmT7OcFGy4ZWjJiWsIFowOAMZp2XAnxMhVFCGZwkInZCZCliWxlXZXxp8SkQlpjctTMw0jFSyk8QVo5HxHKhWUUl5EApTfyYmz76vSgrSCglssOTQwoEwBdgTE0dp5k/BMVlg+oeZ5RamSfpwhQ4rgr4yRdQH0gFjDQ4MbhYbAwAQxJCV6K9WSlGMkw5wV9WqJoZnh4EQdQ7QkgQMmt0A7DUAcvdrMEJEy0LiTcQlc07o9NhpJ8gXEYAjA6AV+oNcU3TgaZYE98KfZySyKLaz/F3JFOFCQEjaVPg==")
 			assert.NoError(t, err)
 			m := getValuesFromkubeletConfig(nodeConfig, mapping)
 			for k, v := range m {
-				if _, ok := tt.expextedNodeConfigFile[k]; ok {
-					assert.Equal(t, v, tt.expextedNodeConfigFile[k])
+				if _, ok := tt.expectedNodeConfigFile[k]; ok {
+					assert.Equal(t, v, tt.expectedNodeConfigFile[k])
 				}
 			}
 		})
@@ -182,7 +182,7 @@ func TestNodeCommamnd(t *testing.T) {
 	}{
 		{
 			name:     "k8s version",
-			commands: "LS0tCmNvbW1hbmRzOgogIC0ga2V5OiBrdWJlQVBJU2VydmVyU3BlY0ZpbGVQZXJtaXNzaW9uCiAgICB0aXRsZTogQVBJIHNlcnZlciBwb2Qgc3BlY2lmaWNhdGlvbiBmaWxlIHBlcm1pc3Npb25zCiAgICBub2RlVHlwZTogbWFzdGVyCiAgICBhdWRpdDogc3RhdCAtYyAlYSAkYXBpc2VydmVyLmNvbmZzCgo=",
+			commands: "QlpoOTFBWSZTWTIucbMAABZfgFAQRgMAECEgTAA/L98gIACVRE01BmpoyaaaAY1BqYin6aJlGT1MTTaTCARuNrygA6IGVuG8RMaNlo+YWhYItG6LCB0+CwTRq9vpCbTs9now4qGE6hai+iDRFTLkKJCLkkNmOE5ir+ZTQoJsLO5JSatWBFxjWci+uAxb09lBmCUGgLzKJPUafi7kinChIGRc42Y=",
 			want: []Command{
 				{
 					Key:      "kubeAPIServerSpecFilePermission",
@@ -196,7 +196,7 @@ func TestNodeCommamnd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetNodesCommands(tt.commands, nil, "worker", "k8s-cis-1.23.2")
+			got, err := GetNodesCommands(tt.commands, map[string]string{}, "master")
 			assert.NoError(t, err)
 			assert.True(t, reflect.DeepEqual(got, tt.want))
 		})
