@@ -133,28 +133,12 @@ When Trivy downloads the checks database, it includes the following folder struc
            |- kubernetes
       |- commands
            |- kubernetes  
+           |- config
 ```
 
 ### Preparing commands data for compliance report as input for node-colector
 
 When the Trivy command is executed: `trivy k8s --compliance k8s-cis`, the relevant compliance specification will be parsed based on the spec name `k8s-cis` and `k8s_version`. It will build a list of command files to be passed to the node-collector, which will parse and execute them, returning the appropriate output.
-
-### Auto detecting spec name and version
-
-In cases where the specification name and version have not been specified, Trivy-Kubernetes will automatically detect the platform type and version.
- Based on this detection, the relevant specification will be identified according to the mapping data included in the configuration file.
-
-mapping config example:
-
-```yaml
-k8s:
-  - op: "="
-    cluster_version: "1.21"
-    spec: k8s-cis-1.21.0
-  - op: ">"
-    cluster_version: "1.21"
-    spec: k8s-cis-1.23.0
-```
 
 
 ### Preparing commands data for cluster infra assessments
