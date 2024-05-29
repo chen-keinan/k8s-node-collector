@@ -94,13 +94,9 @@ func GetNodesCommands(nodeCommands string, configMap map[string]string, nodeType
 	var commands []Command
 	var specInfo SpecInfo
 	if nodeCommands != "" {
-		reader, err := ReadCompressData(io.NopCloser(strings.NewReader(nodeCommands)))
+		fContent, err := ReadCompressData(io.NopCloser(strings.NewReader(nodeCommands)))
 		if err != nil {
 			fmt.Println("failed to read node commands")
-			return nil, err
-		}
-		fContent, err := io.ReadAll(reader)
-		if err != nil {
 			return nil, err
 		}
 		updatedContent := string(fContent)

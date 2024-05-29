@@ -29,7 +29,7 @@ func base64Decode(encodedReader io.Reader) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(string(bytes.TrimSpace(encodedBytes)))
 }
 
-func ReadCompressData(encodedReader io.ReadCloser) (io.ReadCloser, error) {
+func ReadCompressData(encodedReader io.ReadCloser) ([]byte, error) {
 	// base64 decode logs
 	compressedLogsBytes, err := base64Decode(encodedReader)
 	if err != nil {
@@ -40,5 +40,6 @@ func ReadCompressData(encodedReader io.ReadCloser) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	return io.NopCloser(unCompressedLogsReader), nil
+	contentReader := io.NopCloser(unCompressedLogsReader)
+	return io.ReadAll(contentReader)
 }

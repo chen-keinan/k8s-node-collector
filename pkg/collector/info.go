@@ -21,13 +21,9 @@ func LoadConfigParams(nodeFileconfig string) (*Config, error) {
 	if nodeFileconfig == "" {
 		return nil, fmt.Errorf("node file config is empty")
 	}
-	reader, err := ReadCompressData(io.NopCloser(strings.NewReader(nodeFileconfig)))
+	decodedNodeFileconfig, err := ReadCompressData(io.NopCloser(strings.NewReader(nodeFileconfig)))
 	if err != nil {
 		fmt.Println("failed to read node file config")
-		return nil, err
-	}
-	decodedNodeFileconfig, err = io.ReadAll(reader)
-	if err != nil {
 		return nil, err
 	}
 	var np Config
@@ -44,13 +40,9 @@ func LoadKubeletMapping(kubletConfigMapping string) (map[string]string, error) {
 	if kubletConfigMapping == "" {
 		return nil, fmt.Errorf("kubletConfigMapping is empty")
 	}
-	reader, err := ReadCompressData(io.NopCloser(strings.NewReader(kubletConfigMapping)))
+	fContent, err = ReadCompressData(io.NopCloser(strings.NewReader(kubletConfigMapping)))
 	if err != nil {
 		fmt.Println("failed to read nodekubletConfigMapping")
-		return nil, err
-	}
-	fContent, err = io.ReadAll(reader)
-	if err != nil {
 		return nil, err
 	}
 	mapping := make(map[string]string)
