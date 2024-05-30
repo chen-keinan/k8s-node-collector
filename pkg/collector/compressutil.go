@@ -42,6 +42,5 @@ func uncompressAndDecode(kubeletConfig string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	contentReader := io.NopCloser(unCompressedLogsReader)
-	return io.ReadAll(contentReader)
+	return io.ReadAll(unCompressedLogsReader)
 }
