@@ -5,6 +5,7 @@ import (
 	"compress/bzip2"
 	"encoding/base64"
 	"io"
+	"strings"
 )
 
 // decompressBzip2 accept bzip2 compressed bytes and decompress it
@@ -29,7 +30,8 @@ func base64Decode(encodedReader io.Reader) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(string(bytes.TrimSpace(encodedBytes)))
 }
 
-func ReadCompressData(encodedReader io.ReadCloser) ([]byte, error) {
+func uncompressAndDecode(kubeletConfig string) ([]byte, error) {
+	encodedReader := io.NopCloser(strings.NewReader(kubeletConfig))
 	// base64 decode logs
 	compressedLogsBytes, err := base64Decode(encodedReader)
 	if err != nil {

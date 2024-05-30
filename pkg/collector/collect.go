@@ -2,10 +2,8 @@ package collector
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"io"
 	"os"
 	"strings"
 	"time"
@@ -94,7 +92,7 @@ func GetNodesCommands(nodeCommands string, configMap map[string]string, nodeType
 	var commands []Command
 	var specInfo SpecInfo
 	if nodeCommands != "" {
-		fContent, err := ReadCompressData(io.NopCloser(strings.NewReader(nodeCommands)))
+		fContent, err := uncompressAndDecode(nodeCommands)
 		if err != nil {
 			fmt.Println("failed to read node commands")
 			return nil, err
@@ -136,7 +134,7 @@ func loadNodeConfig(ctx context.Context, cluster Cluster, nodeName string, kubel
 	var data []byte
 	var err error
 	if kubeletConfig != "" {
-		data, err = base64.StdEncoding.DecodeString(kubeletConfig)
+		data, err = uncompressAndDecode(kubeletConfig)
 	} else {
 		data, err = cluster.clientSet.RESTClient().Get().AbsPath(fmt.Sprintf("/api/v1/nodes/%s/proxy/configz", nodeName)).DoRaw(ctx)
 	}

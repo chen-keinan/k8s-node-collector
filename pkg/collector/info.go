@@ -2,8 +2,6 @@ package collector
 
 import (
 	"fmt"
-	"io"
-	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -21,7 +19,7 @@ func LoadConfigParams(nodeFileconfig string) (*Config, error) {
 	if nodeFileconfig == "" {
 		return nil, fmt.Errorf("node file config is empty")
 	}
-	decodedNodeFileconfig, err := ReadCompressData(io.NopCloser(strings.NewReader(nodeFileconfig)))
+	decodedNodeFileconfig, err := uncompressAndDecode(nodeFileconfig)
 	if err != nil {
 		fmt.Println("failed to read node file config")
 		return nil, err
@@ -40,7 +38,7 @@ func LoadKubeletMapping(kubletConfigMapping string) (map[string]string, error) {
 	if kubletConfigMapping == "" {
 		return nil, fmt.Errorf("kubletConfigMapping is empty")
 	}
-	fContent, err = ReadCompressData(io.NopCloser(strings.NewReader(kubletConfigMapping)))
+	fContent, err = uncompressAndDecode(kubletConfigMapping)
 	if err != nil {
 		fmt.Println("failed to read nodekubletConfigMapping")
 		return nil, err
