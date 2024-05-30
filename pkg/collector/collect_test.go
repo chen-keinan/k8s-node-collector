@@ -201,13 +201,13 @@ func TestPlatfromVersion(t *testing.T) {
 
 func TestNodeCommamnd(t *testing.T) {
 	tests := []struct {
-		name     string
-		commands string
-		want     []Command
+		name             string
+		commandsFilePath string
+		want             []Command
 	}{
 		{
-			name:     "k8s version",
-			commands: "QlpoOTFBWSZTWTIucbMAABZfgFAQRgMAECEgTAA/L98gIACVRE01BmpoyaaaAY1BqYin6aJlGT1MTTaTCARuNrygA6IGVuG8RMaNlo+YWhYItG6LCB0+CwTRq9vpCbTs9now4qGE6hai+iDRFTLkKJCLkkNmOE5ir+ZTQoJsLO5JSatWBFxjWci+uAxb09lBmCUGgLzKJPUafi7kinChIGRc42Y=",
+			name:             "k8s version",
+			commandsFilePath: "./testdata/fixture/single-check.yaml",
 			want: []Command{
 				{
 					Key:      "kubeAPIServerSpecFilePermission",
@@ -221,7 +221,13 @@ func TestNodeCommamnd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetNodesCommands(tt.commands, map[string]string{}, "master")
+			fd, err := os.ReadFile(tt.commandsFilePath)
+			assert.NoError(t, err)
+			cm, err := bzip2Compress(fd)
+			assert.NoError(t, err)
+			commands := base64.StdEncoding.EncodeToString(cm)
+			assert.NoError(t, err)
+			got, err := GetNodesCommands(string(commands), map[string]string{}, "master")
 			assert.NoError(t, err)
 			assert.True(t, reflect.DeepEqual(got, tt.want))
 		})

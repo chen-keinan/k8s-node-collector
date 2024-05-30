@@ -1,0 +1,6 @@
+---
+commands:
+    - audit: stat -c %a $apiserver.confs
+      key: kubeAPIServerSpecFilePermission
+      title: API server pod specification file permissions
+      nodeType: master
