@@ -223,13 +223,19 @@ func TestNodeCommamnd(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			fd, err := os.ReadFile(tt.commandsFilePath)
 			assert.NoError(t, err)
-			cm, err := bzip2Compress(fd)
-			assert.NoError(t, err)
-			commands := base64.StdEncoding.EncodeToString(cm)
+			commands, err := compressAndEncode(fd)
 			assert.NoError(t, err)
 			got, err := GetNodesCommands(string(commands), map[string]string{}, "master")
 			assert.NoError(t, err)
 			assert.True(t, reflect.DeepEqual(got, tt.want))
 		})
 	}
+}
+
+func compressAndEncode(data []byte) (string, error) {
+	cm, err := bzip2Compress(data)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(cm), nil
 }
