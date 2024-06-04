@@ -146,7 +146,7 @@ jobs:
       - name: Run node-collector job
         run: >
 
-          kubectl apply -f job.yaml
+          kubectl apply -f ./tests/e2e/job.yaml
 
           kubectl wait --for=condition=Complete --timeout=30s job/node-collector
 
@@ -156,4 +156,4 @@ jobs:
 
           echo "compare node collector actual vs expected logs"
 
-          diff -a --suppress-common-lines -y actual-node-collector-output.txt expected-node-collector-output.txt
+          diff -a --suppress-common-lines -y actual-node-collector-output.txt ./test/e2e/expected-node-collector-output.txt
