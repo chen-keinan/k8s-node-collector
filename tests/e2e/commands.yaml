@@ -1,0 +1,349 @@
+---
+commands:
+  - audit: stat -c %U:%G /etc/kubernetes/admin.conf
+    id: CMD-0014
+    key: adminConfFileOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: admin.conf file ownership
+  - audit: stat -c %a /etc/kubernetes/admin.conf
+    id: CMD-0013
+    key: adminConfFilePermissions
+    nodeType: master
+    platforms:
+      - k8s
+    title: admin.conf file permissions
+  - audit: stat -c %U:%G $(ps -ef | grep $kubelet.bins |grep 'client-ca-file' | grep
+      -o 'client-ca-file=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1') 2>
+      /dev/null
+    id: CMD-0029
+    key: certificateAuthoritiesFileOwnership
+    nodeType: worker
+    platforms:
+      - k8s
+    title: Client certificate authorities file ownership
+  - audit: stat -c %a $(ps -ef | grep kubelet |grep 'client-ca-file' | grep -o
+      'client-ca-file=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1') 2>
+      /dev/null
+    id: CMD-0028
+    key: certificateAuthoritiesFilePermissions
+    nodeType: worker
+    platforms:
+      - k8s
+    title: Client certificate authorities file permissions
+  - audit: stat -c %U:%G /*/cni/*
+    id: CMD-0010
+    key: containerNetworkInterfaceFileOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: Container Network Interface file ownership
+  - audit: stat -c %a /*/cni/*
+    id: CMD-0009
+    key: containerNetworkInterfaceFilePermissions
+    nodeType: master
+    platforms:
+      - k8s
+    title: Container Network Interface file permissions
+  - audit: stat -c %U:%G $controllermanager.kubeconfig
+    id: CMD-0018
+    key: controllerManagerConfFileOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: controller-manager.conf file ownership
+  - audit: stat -c %a $controllermanager.kubeconfig
+    id: CMD-0017
+    key: controllerManagerConfFilePermissions
+    nodeType: master
+    platforms:
+      - k8s
+    title: controller-manager.conf file permissions
+  - audit: stat -c %U:%G $etcd.datadirs
+    id: CMD-0012
+    key: etcdDataDirectoryOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: Etcd data directory Ownership
+  - audit: stat -c %a $etcd.datadirs
+    id: CMD-0011
+    key: etcdDataDirectoryPermissions
+    nodeType: master
+    platforms:
+      - k8s
+    title: Etcd data directory permissions
+  - audit: stat -c %U:%G $apiserver.confs
+    id: CMD-0002
+    key: kubeAPIServerSpecFileOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: API server pod specification file ownership
+  - audit: stat -c %a $apiserver.confs
+    id: CMD-0001
+    key: kubeAPIServerSpecFilePermission
+    nodeType: master
+    platforms:
+      - k8s
+    title: API server pod specification file permissions
+  - audit: stat -c %U:%G $controllermanager.confs
+    id: CMD-0004
+    key: kubeControllerManagerSpecFileOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: Controller manager pod specification file ownership is set to root:root
+  - audit: stat -c %a $controllermanager.confs
+    id: CMD-0003
+    key: kubeControllerManagerSpecFilePermission
+    nodeType: master
+    platforms:
+      - k8s
+    title: Controller manager pod specification file permissions
+  - audit: stat -c %U:%G $etcd.confs
+    id: CMD-0008
+    key: kubeEtcdSpecFileOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: Etcd pod specification file ownership
+  - audit: stat -c %a $etcd.confs
+    id: CMD-0007
+    key: kubeEtcdSpecFilePermission
+    nodeType: master
+    platforms:
+      - k8s
+    title: Etcd pod specification file permissions
+  - audit: stat -c %U:%G $(ls -R $kubelet.cafile | awk
+      '/:$/&&f{s=$0;f=0}/:$/&&!f{sub(/:$/,"");s=$0;f=1;next}NF&&f{print s"/"$0
+      }')
+    id: CMD-0019
+    key: kubePKIDirectoryFileOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: Kubernetes PKI directory and file ownership
+  - audit: stat -c %a $(ls -aR $kubelet.cafile | awk
+      '/:$/&&f{s=$0;f=0}/:$/&&!f{sub(/:$/,"");s=$0;f=1;next}NF&&f{print s"/"$0}'
+      | grep \.key$)
+    id: CMD-0021
+    key: kubePKIKeyFilePermissions
+    nodeType: master
+    platforms:
+      - k8s
+    title: Kubernetes PKI certificate file permissions
+  - audit: stat -c %U:%G $scheduler.confs
+    id: CMD-0006
+    key: kubeSchedulerSpecFileOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: Scheduler pod specification file ownership
+  - audit: stat -c %a $scheduler.confs
+    id: CMD-0005
+    key: kubeSchedulerSpecFilePermission
+    nodeType: master
+    platforms:
+      - k8s
+    title: Scheduler pod specification file permissions
+  - audit: output=`stat -c %U:%G $(ps -ef | grep $proxy.bins |grep 'kubeconfig' |
+      grep -o 'kubeconfig=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1')
+      2>/dev/null` || echo $output
+    id: CMD-0025
+    key: kubeconfigFileExistsOwnership
+    nodeType: worker
+    platforms:
+      - k8s
+    title: Kubeconfig file exists ensure ownership
+  - audit: output=`stat -c %a $(ps -ef | grep $proxy.bins |grep 'kubeconfig' | grep
+      -o 'kubeconfig=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1')
+      2>/dev/null` || echo $output
+    id: CMD-0024
+    key: kubeconfigFileExistsPermissions
+    nodeType: worker
+    platforms:
+      - k8s
+    title: Kubeconfig file exists ensure permissions
+  - audit: ps -ef | grep $kubelet.bins |grep ' --anonymous-auth' | grep -o '
+      --anonymous-auth=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0032
+    key: kubeletAnonymousAuthArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --anonymous-auth argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep ' --authorization-mode' | grep -o '
+      --authorization-mode=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0033
+    key: kubeletAuthorizationModeArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --authorization-mode argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep ' --client-ca-file' | grep -o '
+      --client-ca-file=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0034
+    key: kubeletClientCaFileArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --client-ca-file argument is set
+  - audit: stat -c %U:%G $kubelet.kubeconfig
+    id: CMD-0027
+    key: kubeletConfFileOwnership
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet.conf file ownership
+  - audit: stat -c %a $kubelet.kubeconfig
+    id: CMD-0026
+    key: kubeletConfFilePermissions
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet.conf file permissions
+  - audit: stat -c %U:%G $kubelet.confs
+    id: CMD-0031
+    key: kubeletConfigYamlConfigurationFileOwnership
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet config.yaml configuration file ownership
+  - audit: stat -c %a $kubelet.confs
+    id: CMD-0030
+    key: kubeletConfigYamlConfigurationFilePermission
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet config.yaml configuration file permissions
+  - audit: ps -ef | grep $kubelet.bins |grep ' --event-qps' | grep -o '
+      --event-qps=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0040
+    key: kubeletEventQpsArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --event-qps argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep ' --hostname-override' | grep -o '
+      --hostname-override=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0039
+    key: kubeletHostnameOverrideArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet hostname-override argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep ' --make-iptables-util-chains' | grep
+      -o ' --make-iptables-util-chains=[^"]\S*' | awk -F "=" '{print $2}' |awk
+      'FNR <= 1'
+    id: CMD-0038
+    key: kubeletMakeIptablesUtilChainsArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --make-iptables-util-chains argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep 'TLSCipherSuites' | grep -o
+      'TLSCipherSuites=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0045
+    key: kubeletOnlyUseStrongCryptographic
+    nodeType: worker
+    platforms:
+      - k8s
+    title: Kubelet only makes use of Strong Cryptographic
+  - audit: ps -ef | grep $kubelet.bins |grep ' --protect-kernel-defaults' | grep -o
+      ' --protect-kernel-defaults=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR
+      <= 1'
+    id: CMD-0037
+    key: kubeletProtectKernelDefaultsArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --protect-kernel-defaults argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep ' --read-only-port' | grep -o '
+      --read-only-port=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0035
+    key: kubeletReadOnlyPortArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --read-only-port argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep ' --rotate-certificates' | grep -o '
+      --rotate-certificates=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0043
+    key: kubeletRotateCertificatesArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --rotate-certificates argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep 'RotateKubeletServerCertificate' | grep
+      -o 'RotateKubeletServerCertificate=[^"]\S*' | awk -F "=" '{print $2}' |awk
+      'FNR <= 1'
+    id: CMD-0044
+    key: kubeletRotateKubeletServerCertificateArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet RotateKubeletServerCertificate argument is set
+  - audit: stat -c %U:%G $kubelet.svc
+    id: CMD-0023
+    key: kubeletServiceFileOwnership
+    nodeType: worker
+    platforms:
+      - k8s
+    title: Kubelet service file ownership
+  - audit: stat -c %a $kubelet.svc
+    id: CMD-0022
+    key: kubeletServiceFilePermissions
+    nodeType: worker
+    platforms:
+      - k8s
+    title: Kubelet service file permissions
+  - audit: ps -ef | grep $kubelet.bins |grep ' --streamingConnectionIdleTimeout' |
+      grep -o ' --streamingConnectionIdleTimeout=[^"]\S*' | awk -F "=" '{print
+      $2}' |awk 'FNR <= 1'
+    id: CMD-0036
+    key: kubeletStreamingConnectionIdleTimeoutArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --streaming-connection-idle-timeout argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep ' --tls-cert-file' | grep -o '
+      --tls-cert-file=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0041
+    key: kubeletTlsCertFileTlsArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --tls-cert-file argument is set
+  - audit: ps -ef | grep $kubelet.bins |grep ' --tls-private-key-file' | grep -o '
+      --tls-private-key-file=[^"]\S*' | awk -F "=" '{print $2}' |awk 'FNR <= 1'
+    id: CMD-0042
+    key: kubeletTlsPrivateKeyFileArgumentSet
+    nodeType: worker
+    platforms:
+      - k8s
+    title: kubelet --tls-private-key-file argument is set
+  - audit: stat -c %a $(ls -aR $kubelet.cafile |
+      awk'/:$/&&f{s=$0;f=0}/:$/&&!f{sub(/:$/,"");s=$0;f=1;next}NF&&f{print
+      s"/"$0}' | grep \.crt$)
+    id: CMD-0020
+    key: kubernetesPKICertificateFilePermissions
+    nodeType: master
+    platforms:
+      - k8s
+    title: Kubernetes PKI certificate file permissions
+  - audit: stat -c %U:%G $scheduler.kubeconfig
+    id: CMD-0016
+    key: schedulerConfFileOwnership
+    nodeType: master
+    platforms:
+      - k8s
+    title: scheduler.conf file ownership
+  - audit: stat -c %a $scheduler.kubeconfig
+    id: CMD-0015
+    key: schedulerConfFilePermissions
+    nodeType: master
+    platforms:
+      - k8s
+    title: scheduler.conf file permissions

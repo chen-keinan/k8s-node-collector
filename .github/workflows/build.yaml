@@ -143,8 +143,19 @@ jobs:
       - name: Install JQ Tool
         uses: mbround18/install-jq@v1
 
+      - name: Retrieve version
+        run: |
+          echo "KUBELET_CONFIG=$(cat ./tests/e2e/kubeletconfig.json | bzip2 -c | base64)" >> $GITHUB_OUTPUT
+          echo "NODE_CONFIG=$(cat ./tests/e2e/nodeconfig.yaml | bzip2 -c | base64)" >> $GITHUB_OUTPUT
+          echo "KUBELET_MAPPING=$(cat ./tests/e2e/kubeletconfig-mapping.yaml | bzip2 -c | base64)" >> $GITHUB_OUTPUT
+          echo "COMMANDS=$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)" >> $GITHUB_OUTPUT
+        id: args
       - name: Run node-collector job
         run: >
+          sed -i 's\COMMANDS\${{ steps.args.outputs.COMMANDS }}\g' ./tests/e2e/job.yaml
+          sed -i 's\NODE_CONFIG\${{ steps.args.outputs.NODE_CONFIG }}\g' ./tests/e2e/job.yaml
+          sed -i 's\KUBELET_MAPPING\${{ steps.args.outputs.KUBELET_MAPPING }}\g' ./tests/e2e/job.yaml
+          sed -i 's\KUBELET_CONFIG\${{ steps.args.outputs.KUBELET_CONFIG }}\g' ./tests/e2e/job.yaml
 
           kubectl apply -f ./tests/e2e/job.yaml
 
