@@ -223,7 +223,7 @@ func TestNodeCommamnd(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			fd, err := os.ReadFile(tt.commandsFilePath)
 			assert.NoError(t, err)
-			commands, err := compressAndEncode(fd)
+			commands, err := CompressAndEncode(fd)
 			assert.NoError(t, err)
 			got, err := GetNodesCommands(string(commands), map[string]string{}, "master")
 			assert.NoError(t, err)
@@ -232,7 +232,7 @@ func TestNodeCommamnd(t *testing.T) {
 	}
 }
 
-func compressAndEncode(data []byte) (string, error) {
+func CompressAndEncode(data []byte) (string, error) {
 	cm, err := bzip2Compress(data)
 	if err != nil {
 		return "", err
