@@ -148,7 +148,7 @@ jobs:
 
           echo "wait for job to complete sec"
 
-          kubectl wait --for=condition=Complete --timeout=30s job/node-collectorsleep 20
+          kubectl wait --for=condition=Complete --timeout=30s job/node-collector
 
           kubectl get jobs
 
