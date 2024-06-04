@@ -152,10 +152,13 @@ jobs:
         id: args
       - name: Run node-collector job
         run: >
-          sed -i 's\COMMANDS\${{ env.COMMANDS }}\g' ./tests/e2e/job.yaml
-          sed -i 's\NODE_CONFIG\${{ env.NODE_CONFIG }}\g' ./tests/e2e/job.yaml
-          sed -i 's\KUBELET_MAPPING\${{ env.KUBELET_MAPPING }}\g' ./tests/e2e/job.yaml
-          sed -i 's\KUBELET_CONFIG\${{ env.KUBELET_CONFIG }}\g' ./tests/e2e/job.yaml
+          sed -i 's/COMMANDS/"${{ env.COMMANDS }}"/' ./tests/e2e/job.yaml
+
+          sed -i 's/NODE_CONFIG/${{ env.NODE_CONFIG }}/' ./tests/e2e/job.yaml
+
+          sed -i 's/KUBELET_MAPPING/${{ env.KUBELET_MAPPING }}/' ./tests/e2e/job.yaml
+
+          sed -i 's/KUBELET_CONFIG/${{ env.KUBELET_CONFIG }}/' ./tests/e2e/job.yaml
 
           kubectl apply -f ./tests/e2e/job.yaml
 
