@@ -145,10 +145,10 @@ jobs:
 
       - name: Retrieve job args
         run: |
-          echo "KUBELET_CONFIG=$(cat ./tests/e2e/kubeletconfig.json | bzip2 -c | base64)" >> $GITHUB_ENV
-          echo "NODE_CONFIG=$(cat ./tests/e2e/nodeconfig.yaml | bzip2 -c | base64)" >> $GITHUB_ENV
-          echo "KUBELET_MAPPING=$(cat ./tests/e2e/kubeletconfig-mapping.yaml | bzip2 -c | base64)" >> $GITHUB_ENV
-          echo "COMMANDS=$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)" >> $GITHUB_ENV
+          echo "KUBELET_CONFIG=$(cat ./tests/e2e/kubeletconfig.json | bzip2 -c | base64)" >> "$GITHUB_ENV"
+          echo "NODE_CONFIG=$(cat ./tests/e2e/nodeconfig.yaml | bzip2 -c | base64)" >> "$GITHUB_ENV"
+          echo "KUBELET_MAPPING=$(cat ./tests/e2e/kubeletconfig-mapping.yaml | bzip2 -c | base64)" >> "$GITHUB_ENV"
+          echo "COMMANDS=$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)" >> "$GITHUB_ENV"
         id: args
       - name: Run node-collector job
         run: >
