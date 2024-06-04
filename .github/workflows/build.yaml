@@ -156,4 +156,4 @@ jobs:
 
           echo "compare node collector actual vs expected logs"
 
-          diff -a --suppress-common-lines -y actual-node-collector-output.txt ./test/e2e/expected-node-collector-output.txt
+          diff -a --suppress-common-lines -y actual-node-collector-output.txt ./tests/e2e/expected-node-collector-output.txt
