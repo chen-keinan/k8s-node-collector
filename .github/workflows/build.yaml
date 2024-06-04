@@ -145,20 +145,20 @@ jobs:
 
       - name: Retrieve job args
         run: |
-          export "KUBELET_CONFIG=$(cat ./tests/e2e/kubeletconfig.json | bzip2 -c | base64)"
-          export "NODE_CONFIG=$(cat ./tests/e2e/nodeconfig.yaml | bzip2 -c | base64)"
-          export "KUBELET_MAPPING=$(cat ./tests/e2e/kubeletconfig-mapping.yaml | bzip2 -c | base64)"
-          export "COMMANDS=$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)"
+          echo "KUBELET_CONFIG=$(cat ./tests/e2e/kubeletconfig.json | bzip2 -c | base64)" >> $GITHUB_ENV
+          echo "NODE_CONFIG=$(cat ./tests/e2e/nodeconfig.yaml | bzip2 -c | base64)" >> $GITHUB_ENV
+          echo "KUBELET_MAPPING=$(cat ./tests/e2e/kubeletconfig-mapping.yaml | bzip2 -c | base64)" >> $GITHUB_ENV
+          echo "COMMANDS=$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)" >> $GITHUB_ENV
         id: args
       - name: Run node-collector job
         run: >
-          sed -i 's/COMMANDS/"${{ env.COMMANDS }}"/' ./tests/e2e/job.yaml
+          sed -i 's/COMMANDS/"$COMMANDS"/' ./tests/e2e/job.yaml
 
-          sed -i 's/NODE_CONFIG/${{ env.NODE_CONFIG }}/' ./tests/e2e/job.yaml
+          sed -i 's/NODE_CONFIG/"$NODE_CONFIG"/' ./tests/e2e/job.yaml
 
-          sed -i 's/KUBELET_MAPPING/${{ env.KUBELET_MAPPING }}/' ./tests/e2e/job.yaml
+          sed -i 's/KUBELET_MAPPING/"$KUBELET_MAPPING"/' ./tests/e2e/job.yaml
 
-          sed -i 's/KUBELET_CONFIG/${{ env.KUBELET_CONFIG }}/' ./tests/e2e/job.yaml
+          sed -i 's/KUBELET_CONFIG/$KUBELET_CONFIG"/' ./tests/e2e/job.yaml
 
           kubectl apply -f ./tests/e2e/job.yaml
 
