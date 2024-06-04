@@ -146,8 +146,11 @@ jobs:
       - name: Run node-collector job
         run: >
           sed -i "s/COMMANDS/$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)/" ./tests/e2e/job.yaml
+
           sed -i "s/KUBELET_CONFIG/"$(cat ./tests/e2e/kubeletconfig.json | bzip2 -c | base64)/" ./tests/e2e/job.yaml
+
           sed -i "s/NODE_CONFIG/"$(cat ./tests/e2e/nodeconfig.yaml | bzip2 -c | base64)/" ./tests/e2e/job.yaml
+          
           sed -i "s/KUBELET_MAPPING/"$(cat ./tests/e2e/kubeletconfig-mapping.yaml | bzip2 -c | base64)/" ./tests/e2e/job.yaml
 
           kubectl apply -f ./tests/e2e/job.yaml
