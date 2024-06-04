@@ -156,6 +156,10 @@ jobs:
 
           kubectl logs job/node-collector
 
+          echo "write logs to file"
+
           kubectl logs job/node-collector > actual-node-collector-output.txt
+
+          echo "compareactual vs expected logs"
 
           diff -a --suppress-common-lines -y actual-node-collector-output.txt expected-node-collector-output.txt
