@@ -143,22 +143,15 @@ jobs:
       - name: Install JQ Tool
         uses: mbround18/install-jq@v1
 
-      - name: Retrieve job args
-        run: |
-          echo "KUBELET_CONFIG=$(cat ./tests/e2e/kubeletconfig.json | bzip2 -c | base64)" >> "$GITHUB_ENV"
-          echo "NODE_CONFIG=$(cat ./tests/e2e/nodeconfig.yaml | bzip2 -c | base64)" >> "$GITHUB_ENV"
-          echo "KUBELET_MAPPING=$(cat ./tests/e2e/kubeletconfig-mapping.yaml | bzip2 -c | base64)" >> "$GITHUB_ENV"
-          echo "COMMANDS=$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)" >> "$GITHUB_ENV"
-        id: args
       - name: Run node-collector job
         run: >
-          sed -i 's/COMMANDS/"$COMMANDS"/' ./tests/e2e/job.yaml
+          sed -i 's/COMMANDS/"$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)"/' ./tests/e2e/job.yaml
 
-          sed -i 's/NODE_CONFIG/"$NODE_CONFIG"/' ./tests/e2e/job.yaml
+          sed -i 's/NODE_CONFIG/"$(cat ./tests/e2e/nodeconfig.yaml | bzip2 -c | base64)"/' ./tests/e2e/job.yaml
 
-          sed -i 's/KUBELET_MAPPING/"$KUBELET_MAPPING"/' ./tests/e2e/job.yaml
+          sed -i 's/KUBELET_MAPPING/"$(cat ./tests/e2e/kubeletconfig-mapping.yaml | bzip2 -c | base64)"/' ./tests/e2e/job.yaml
 
-          sed -i 's/KUBELET_CONFIG/"$KUBELET_CONFIG"/' ./tests/e2e/job.yaml
+          sed -i 's/KUBELET_CONFIG/"$(cat ./tests/e2e/kubeletconfig.json | bzip2 -c | base64)"/' ./tests/e2e/job.yaml
 
           kubectl apply -f ./tests/e2e/job.yaml
 
