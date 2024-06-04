@@ -71,7 +71,9 @@ func main() {
 			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
 		}
 	}
-	b, err := job.DeepCopy().Marshal()
+	job.APIVersion = "batch/v1"
+	job.Kind = "Job"
+	b, err := yaml.Marshal(job)
 	if err != nil {
 		panic(err)
 	}
