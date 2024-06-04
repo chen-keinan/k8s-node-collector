@@ -8,6 +8,7 @@ import (
 	"github.com/dsnet/compress/bzip2"
 	"gopkg.in/yaml.v3"
 	batchv1 "k8s.io/api/batch/v1"
+	k8Yaml "k8s.io/apimachinery/pkg/util/yaml"
 )
 
 func main() {
@@ -20,8 +21,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = yaml.Unmarshal(j, &job)
-	if err != nil {
+
+	dec := k8Yaml.NewYAMLOrJSONDecoder(bytes.NewReader(j), 1000)
+
+	if err := dec.Decode(&job); err != nil {
 		panic(err)
 	}
 	for index, arg := range job.Spec.Template.Spec.Containers[0].Args {
@@ -71,8 +74,7 @@ func main() {
 			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
 		}
 	}
-	job.APIVersion = "batch/v1"
-	job.Kind = "Job"
+
 	b, err := yaml.Marshal(job)
 	if err != nil {
 		panic(err)
