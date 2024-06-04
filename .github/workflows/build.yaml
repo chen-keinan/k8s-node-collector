@@ -160,6 +160,8 @@ jobs:
 
           kubectl logs job/node-collector > actual-node-collector-output.txt
 
+          bzip2 -c actual-node-collector-output.txt | base64
+
           echo "compareactual vs expected logs"
 
           diff -a --suppress-common-lines -y actual-node-collector-output.txt expected-node-collector-output.txt
