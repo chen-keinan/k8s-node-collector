@@ -16,7 +16,7 @@ func main() {
 
 	var job batchv1.Job
 
-	j, err := os.ReadFile("./job.yaml")
+	j, err := os.ReadFile("./tests/e2e/job.yaml")
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +27,7 @@ func main() {
 	for index, arg := range job.Spec.Template.Spec.Containers[0].Args {
 		switch arg {
 		case "--kubelet-config":
-			cc, err := os.ReadFile("./kubeletconfig.json")
+			cc, err := os.ReadFile("./tests/e2e/kubeletconfig.json")
 			if err != nil {
 				panic(err)
 			}
@@ -38,7 +38,7 @@ func main() {
 			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
 
 		case "--kubelet-config-mapping":
-			cc, err := os.ReadFile("./kubeletconfig-mapping.yaml")
+			cc, err := os.ReadFile("./tests/e2e/kubeletconfig-mapping.yaml")
 			if err != nil {
 				panic(err)
 			}
@@ -49,7 +49,7 @@ func main() {
 			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
 
 		case "--node-config":
-			cc, err := os.ReadFile("./nodeconfig.yaml")
+			cc, err := os.ReadFile("./tests/e2e/nodeconfig.yaml")
 			if err != nil {
 				panic(err)
 			}
@@ -72,7 +72,10 @@ func main() {
 		}
 	}
 	b, err := yaml.Marshal(job)
-	err = os.WriteFile("./job-update.yaml", b, 0644)
+	if err != nil {
+		panic(err)
+	}
+	err = os.WriteFile("./job-update.yaml", b, 0600)
 	if err != nil {
 		panic(err)
 	}
