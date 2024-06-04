@@ -147,6 +147,7 @@ jobs:
           kubectl apply -f job.yaml
 
           echo "wait 20 sec"
+
           sleep 20
 
           kubectl get jobs
