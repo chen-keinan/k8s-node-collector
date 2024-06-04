@@ -148,19 +148,19 @@ jobs:
 
           export COMMANDS="$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)"
 
-          sed -i 's/COMMANDS/('"$COMMANDS"')/' ./tests/e2e/job.yaml
+          sed -i -e "s/COMMANDS/$COMMANDS/g" ./tests/e2e/job.yaml
 
           export KUBELET_CONFIG="$(cat ./tests/e2e/kubeletconfig.json | bzip2 -c | base64)"
 
-          sed -i 's/KUBELET_CONFIG/('"$KUBELET_CONFIG"')/' ./tests/e2e/job.yaml
+          sed -i -e "s/KUBELET_CONFIG/$KUBELET_CONFIG/g" ./tests/e2e/job.yaml
 
           export NODE_CONFIG="$(cat ./tests/e2e/nodeconfig.yaml | bzip2 -c | base64)"
 
-          sed -i 's/NODE_CONFIG/('"$NODE_CONFIG"')/' ./tests/e2e/job.yaml
+          sed -i -e "s/NODE_CONFIG/$NODE_CONFIG/g" ./tests/e2e/job.yaml
 
           export KUBELET_MAPPING="$(cat ./tests/e2e/kubeletconfig-mapping.yaml | bzip2 -c | base64)"
 
-          sed -i 's/KUBELET_MAPPING/('"$KUBELET_MAPPING"')/' ./tests/e2e/job.yaml
+          sed -i -e "s/KUBELET_MAPPING/$KUBELET_MAPPING/g" ./tests/e2e/job.yaml
 
           kubectl apply -f ./tests/e2e/job.yaml
 
