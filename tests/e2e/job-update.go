@@ -71,7 +71,7 @@ func main() {
 			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
 		}
 	}
-	b, err := yaml.Marshal(job)
+	b, err := job.DeepCopy().Marshal()
 	if err != nil {
 		panic(err)
 	}
