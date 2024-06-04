@@ -145,26 +145,15 @@ jobs:
 
       - name: Run node-collector job
         run: >
-          echo "applying job"
 
           kubectl apply -f job.yaml
 
-          echo "wait for job to complete sec"
-
           kubectl wait --for=condition=Complete --timeout=30s job/node-collector
-
-          kubectl get jobs
-
-          echo "print logs"
-
-          kubectl logs job/node-collector
-
-          echo "write logs to file"
 
           kubectl logs job/node-collector > full-actual-node-collector-output.txt
 
           jq -r .info full-actual-node-collector-output.txt > actual-node-collector-output.txt
 
-          echo "compareactual vs expected logs"
+          echo "compare node collector actual vs expected logs"
 
           diff -a --suppress-common-lines -y actual-node-collector-output.txt expected-node-collector-output.txt
