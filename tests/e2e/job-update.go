@@ -4,82 +4,61 @@ import (
 	"bytes"
 	"encoding/base64"
 	"os"
+	"strings"
 
 	"github.com/dsnet/compress/bzip2"
-	"gopkg.in/yaml.v3"
-	batchv1 "k8s.io/api/batch/v1"
-	k8Yaml "k8s.io/apimachinery/pkg/util/yaml"
 )
 
 func main() {
-	// This test is to verify that the args update works as expected
-	// and that the new args are reflected in the pod
-
-	var job batchv1.Job
-
-	j, err := os.ReadFile("./tests/e2e/job.yaml")
+	job, err := os.ReadFile("./tests/e2e/job.yaml")
 	if err != nil {
 		panic(err)
 	}
-
-	dec := k8Yaml.NewYAMLOrJSONDecoder(bytes.NewReader(j), 1000)
-
-	if err := dec.Decode(&job); err != nil {
-		panic(err)
-	}
-	for index, arg := range job.Spec.Template.Spec.Containers[0].Args {
-		switch arg {
-		case "--kubelet-config":
-			cc, err := os.ReadFile("./tests/e2e/kubeletconfig.json")
-			if err != nil {
-				panic(err)
-			}
-			cce, err := CompressAndEncode(cc)
-			if err != nil {
-				panic(err)
-			}
-			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
-
-		case "--kubelet-config-mapping":
-			cc, err := os.ReadFile("./tests/e2e/kubeletconfig-mapping.yaml")
-			if err != nil {
-				panic(err)
-			}
-			cce, err := CompressAndEncode(cc)
-			if err != nil {
-				panic(err)
-			}
-			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
-
-		case "--node-config":
-			cc, err := os.ReadFile("./tests/e2e/nodeconfig.yaml")
-			if err != nil {
-				panic(err)
-			}
-			cce, err := CompressAndEncode(cc)
-			if err != nil {
-				panic(err)
-			}
-			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
-
-		case "--node-commands":
-			cc, err := os.ReadFile("./tests/e2e/commands.yaml")
-			if err != nil {
-				panic(err)
-			}
-			cce, err := CompressAndEncode(cc)
-			if err != nil {
-				panic(err)
-			}
-			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
-		}
-	}
-
-	b, err := yaml.Marshal(job)
+	jobString := string(job)
+	// update kube config arg
+	cc, err := os.ReadFile("./tests/e2e/kubeletconfig.json")
 	if err != nil {
 		panic(err)
 	}
-	err = os.WriteFile("./tests/e2e/job-update.yaml", b, 0600)
+	cce, err := CompressAndEncode(cc)
+	if err != nil {
+		panic(err)
+	}
+	jobString = strings.ReplaceAll(jobString, "KUBELET_CONFIG", string(cce))
+
+	// update kube config mapping arg
+	cc, err = os.ReadFile("./tests/e2e/kubeletconfig-mapping.yaml")
+	if err != nil {
+		panic(err)
+	}
+	cce, err = CompressAndEncode(cc)
+	if err != nil {
+		panic(err)
+	}
+	jobString = strings.ReplaceAll(jobString, "KUBELET_MAPPING", string(cce))
+
+	// update node config arg
+	cc, err = os.ReadFile("./tests/e2e/nodeconfig.yaml")
+	if err != nil {
+		panic(err)
+	}
+	cce, err = CompressAndEncode(cc)
+	if err != nil {
+		panic(err)
+	}
+	jobString = strings.ReplaceAll(jobString, "NODE_CONFIG", string(cce))
+
+	// update node commands arg
+	cc, err = os.ReadFile("./tests/e2e/commands.yaml")
+	if err != nil {
+		panic(err)
+	}
+	cce, err = CompressAndEncode(cc)
+	if err != nil {
+		panic(err)
+	}
+	jobString = strings.ReplaceAll(jobString, "COMMANDS", string(cce))
+	err = os.WriteFile("./tests/e2e/job.yaml", []byte(jobString), 0600)
 	if err != nil {
 		panic(err)
 	}

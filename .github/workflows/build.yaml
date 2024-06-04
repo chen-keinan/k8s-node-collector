@@ -148,7 +148,7 @@ jobs:
 
           go run ./tests/e2e/job-update.go
 
-          kubectl apply -f ./tests/e2e/job-update.yaml
+          kubectl apply -f ./tests/e2e/job.yaml
 
           kubectl wait --for=condition=Complete --timeout=30s job/node-collector
 
