@@ -140,6 +140,9 @@ jobs:
 
           kind load image-archive node-collector.tar
 
+      - name: Install JQ Tool
+        uses: mbround18/install-jq@v1
+
       - name: Run node-collector job
         run: >
           echo "applying job"
@@ -158,9 +161,9 @@ jobs:
 
           echo "write logs to file"
 
-          kubectl logs job/node-collector > actual-node-collector-output.txt
+          kubectl logs job/node-collector > full-actual-node-collector-output.txt
 
-          bzip2 -c actual-node-collector-output.txt | base64
+          jq -r .info full-actual-node-collector-output.txt > actual-node-collector-output.txt
 
           echo "compareactual vs expected logs"
 
