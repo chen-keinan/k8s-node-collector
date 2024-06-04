@@ -158,7 +158,7 @@ jobs:
 
           sed -i 's/KUBELET_MAPPING/"$KUBELET_MAPPING"/' ./tests/e2e/job.yaml
 
-          sed -i 's/KUBELET_CONFIG/$KUBELET_CONFIG"/' ./tests/e2e/job.yaml
+          sed -i 's/KUBELET_CONFIG/"$KUBELET_CONFIG"/' ./tests/e2e/job.yaml
 
           kubectl apply -f ./tests/e2e/job.yaml
 
