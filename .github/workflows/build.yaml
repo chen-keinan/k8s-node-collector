@@ -80,3 +80,79 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           files: ./coverage.txt
+  e2e-testing:
+    name: Run end to end testing
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_CLI_EXPERIMENTAL: enabled
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Release snapshot
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: v1.7.0
+          args: release -f=goreleaser-e2e.yaml --snapshot --skip-publish --rm-dist
+      - name: Install kind and create cluster
+        run: >
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/${{ env.KIND_VERSION
+          }}/kind-linux-amd64
+
+          chmod +x ./kind
+
+          sudo mv ./kind /usr/local/bin/kind
+
+          kind create cluster
+
+          curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/amd64/kubectl
+
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+      - name: Test connection to Kubernetes cluster
+        run: |
+          kubectl cluster-info
+          kubectl wait --for=condition=Ready nodes --all --timeout=300s
+          kubectl describe node
+      - name: Load node-collector image to cluster
+        run: >
+
+          echo "tagging image with e2e tag"
+
+          docker tag ghcr.io/aquasecurity/node-collector:${{ github.sha }}-amd64 ghcr.io/aquasecurity/node-collector:e2e
+
+          echo "saving image to tar file"
+
+          docker save -o node-collector.tar ghcr.io/aquasecurity/node-collector:e2e
+
+          sleep 5
+
+          echo "loading image to kind cluster"
+
+          kind load image-archive node-collector.tar
+
+      - name: Run node-collector job
+        run: >
+          echo "applying job"
+
+          kubectl apply -f job.yaml
+
+          echo "wait 20 sec"
+          sleep 20
+
+          kubectl get jobs
+
+          echo "reading logs"
+
+          kubectl logs -f job/node-collector
+
+          diff -a --suppress-common-lines -y actual-node-collector-output.txt expected-node-collector-output.txt
