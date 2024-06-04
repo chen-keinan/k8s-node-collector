@@ -146,7 +146,7 @@ jobs:
       - name: Run node-collector job
         run: >
 
-          go run job-update.go
+          go run ./tests/e2e/job-update.go
 
           kubectl apply -f ./tests/e2e/job-update.yaml
 
