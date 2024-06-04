@@ -146,8 +146,6 @@ jobs:
       - name: Run node-collector job
         run: >
 
-          $ sed 's/($USER)/('"$USER"')/' file
-
           export COMMANDS="$(cat ./tests/e2e/commands.yaml | bzip2 -c | base64)"
 
           sed -i 's/COMMANDS/('"$COMMANDS"')/' ./tests/e2e/job.yaml
