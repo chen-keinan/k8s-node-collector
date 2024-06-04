@@ -60,7 +60,7 @@ func main() {
 			job.Spec.Template.Spec.Containers[0].Args[index+1] = cce
 
 		case "--node-commands":
-			cc, err := os.ReadFile("./commands.yaml")
+			cc, err := os.ReadFile("./tests/e2e/commands.yaml")
 			if err != nil {
 				panic(err)
 			}
@@ -75,7 +75,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = os.WriteFile("./job-update.yaml", b, 0600)
+	err = os.WriteFile("./tests/e2e/job-update.yaml", b, 0600)
 	if err != nil {
 		panic(err)
 	}
